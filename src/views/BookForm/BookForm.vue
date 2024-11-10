@@ -8,10 +8,14 @@
       
       <div class="text-sm text-primary-200">
         <p>Автор(ы): 
-          <span v-for="(author, index) in authorList" :key="author">
-            <a href="#" @click.prevent="showAuthorInfo(author)" class="underline hover:text-primary-100">
-              {{ author }}
-            </a><span v-if="index < authorList.length - 1">, </span>
+          <span v-for="(author, index) in authorList" :key="author.name">
+            <router-link
+              :to="{ name: 'author', query: { authorList: JSON.stringify(authorList), bookTitle: title } }"
+              class="underline hover:text-primary-100"
+            >
+              {{ author.name }}
+            </router-link>
+            <span v-if="index < authorList.length - 1">, </span>
           </span>
         </p>
         <p>Опубликовано: {{ firstPublished }}</p>
@@ -41,17 +45,6 @@
         </button>
       </div>
     </div>
-
-    <!-- Модальное окно с информацией об авторе -->
-    <div v-if="isAuthorModalVisible" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white p-6 rounded-lg w-80 text-black">
-        <h3 class="text-xl font-bold mb-4">Информация об авторе</h3>
-        <p>{{ selectedAuthor }}: Здесь будет информация об авторе.</p>
-        <button @click="closeAuthorModal" class="mt-4 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded">
-          Закрыть
-        </button>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -59,26 +52,25 @@
 export default {
   data() {
     return {
-      title: "Пример названия книги",
+      title: "Название книги",
       subtitle: "Подзаголовок",
       authors: "Имя автора, Другой автор",
       firstPublished: "2023 год",
-      description: "Описание книги, ооооооооооооооооочень длинное",
+      description: "Описание книги, которое может быть достаточно длинным, чтобы требовать прокрутки.",
       bookSubjects: "Жанр, Другой жанр, Ещё один жанр",
       images: [
         new URL('@/assets/book1.jpg', import.meta.url).href,
       ],
       currentIndex: 0,
-      isAuthorModalVisible: false,
-      selectedAuthor: "",
+      authorList: [
+        { name: "Имя автора", birthDate: "31 июля 1965", deathDate: null, bio: "Краткая биография автора", wikipediaLink: "https://www.wikipedia.org/" },
+        { name: "Другой автор", birthDate: "15 августа 1970", deathDate: null, bio: "Краткая биография другого автора", wikipediaLink: "https://www.wikipedia.org/" }
+      ],
     };
   },
   computed: {
     currentImage() {
       return this.images[this.currentIndex];
-    },
-    authorList() {
-      return this.authors.split(', ');
     },
     bookSubjectsList() {
       return this.bookSubjects.split(', ');
@@ -90,14 +82,6 @@ export default {
     },
     previousImage() {
       this.currentIndex = (this.currentIndex - 1 + this.images.length) % this.images.length;
-    },
-    showAuthorInfo(author) {
-      this.selectedAuthor = author;
-      this.isAuthorModalVisible = true;
-    },
-    closeAuthorModal() {
-      this.isAuthorModalVisible = false;
-      this.selectedAuthor = "";
     }
   }
 };
