@@ -35,11 +35,6 @@
   </div>
 </template>
 
-<script lang="js">
-import InputGroup from 'primevue/inputgroup'
-import InputText from 'primevue/inputgroup'
-import Password from 'primevue/inputgroup'
-import Button from 'primevue/button'
-</script>
+<script lang="js"></script>
 
 <style lang="scss" scoped></style>
