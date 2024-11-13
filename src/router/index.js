@@ -6,7 +6,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: () => import('@/views/AboutView.vue')
+      component: () => import('@/views/MainPage')
     },
     {
       path: '/auth',
@@ -21,12 +21,12 @@ const router = createRouter({
     {
       path: '/author',
       name: 'author',
-      component: () => import('@/views/AuthorInfo/AuthorInfo.vue'),
-      props: route => ({
+      component: () => import('@/views/AuthorInfo'),
+      props: (route) => ({
         authorList: JSON.parse(route.query.authorList),
         bookTitle: route.query.bookTitle
       })
-    },
+    }
   ]
 })
 
