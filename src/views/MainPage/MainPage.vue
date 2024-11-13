@@ -29,7 +29,7 @@
         :paginator="true"
         :rows="rowsPerPage"
         scrollable
-        scrollHeight="90%"
+        scrollHeight="85%"
         :first="firstRow"
         @page="onPageChange"
         selectionMode="single"

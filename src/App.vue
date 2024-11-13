@@ -1,9 +1,58 @@
 <script setup>
+import { ref } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
+import Menubar from 'primevue/menubar'
+
 import './assets/tailwind.css'
+
+const items = ref([
+  {
+    label: 'Файл',
+    icon: 'pi pi-search',
+    items: [
+      {
+        label: 'Вход',
+        icon: 'pi pi-bolt'
+      },
+      {
+        label: 'Выход',
+        icon: 'pi pi-server'
+      },
+      {
+        label: 'Закрыть',
+        command: () => {
+          window.close()
+        }
+      }
+    ]
+  },
+  {
+    label: 'Библиотека',
+    icon: 'pi pi-envelope',
+    items: [
+      {
+        label: 'Управление клиентами',
+        icon: 'pi pi-bolt'
+      },
+      {
+        label: 'Выдача книг',
+        icon: 'pi pi-server'
+      },
+      {
+        label: 'Отчеты',
+        icon: 'pi pi-pencil'
+      }
+    ]
+  }
+])
 </script>
 
 <template>
+  <div class="h-screen w-screen flex overflow-hidden flex-col">
+    <Menubar :model="items"></Menubar>
+    <RouterView />
+  </div>
+
   <!-- <header>
     <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
 
@@ -16,8 +65,6 @@ import './assets/tailwind.css'
       </nav>
     </div>
   </header> -->
-
-  <RouterView />
 </template>
 
 <style scoped>
