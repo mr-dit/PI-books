@@ -1,21 +1,21 @@
 <template>
   <div class="h-screen w-screen flex overflow-hidden">
     <!-- Панель поиска -->
-    <div class="w-1/4 h-full p-4 bg-gray-100 border-r border-gray-300 overflow-y-auto">
-      <h2 class="font-bold text-lg mb-4">Поиск книг</h2>
+    <div class="w-1/4 h-full p-4 surface-border overflow-y-auto">
+      <h2 class="text-primary font-bold text-lg mb-4">Поиск книг</h2>
       <div class="mb-4">
-        <label for="title" class="block font-semibold">Заголовок</label>
+        <label for="title" class="block text-secondary font-semibold mb-2">Заголовок</label>
         <InputText id="title" v-model="searchCriteria.title" class="w-full" />
       </div>
       <div class="mb-4">
-        <label for="author" class="block font-semibold">Автор</label>
+        <label for="author" class="block text-secondary font-semibold mb-2">Автор</label>
         <InputText id="author" v-model="searchCriteria.author" class="w-full" />
       </div>
       <div class="mb-4">
-        <label for="genre" class="block font-semibold">Жанр</label>
+        <label for="genre" class="block text-secondary font-semibold mb-2">Жанр</label>
         <InputText id="genre" v-model="searchCriteria.genre" class="w-full" />
       </div>
-      <Button label="Поиск" icon="pi pi-search" @click="performSearch" class="w-full" />
+      <Button label="Поиск" icon="pi pi-search" @click="performSearch" class="w-full p-button" />
     </div>
 
     <!-- Результаты поиска и подробная информация -->
