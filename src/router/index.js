@@ -16,17 +16,13 @@ const router = createRouter({
     {
       path: '/book',
       name: 'book',
-      component: () => import('@/views/BookForm')
+      component: () => import('@/components/BookForm')
     },
     {
       path: '/author',
       name: 'author',
-      component: () => import('@/views/AuthorInfo/AuthorInfo.vue'),
-      props: route => ({
-        authorList: JSON.parse(route.query.authorList),
-        bookTitle: route.query.bookTitle
-      })
-    },
+      component: () => import('@/components/AuthorInfo')
+    }
   ]
 })
 
