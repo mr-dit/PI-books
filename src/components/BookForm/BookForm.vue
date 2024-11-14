@@ -81,7 +81,7 @@
 import { ref, computed } from 'vue'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
-import AuthorInfo from '@/components/AuthorInfo/AuthorInfo.vue';
+import AuthorInfo from '@/components/AuthorInfo/AuthorInfo.vue'
 
 // Основные данные книги
 const title = ref('Название книги')
