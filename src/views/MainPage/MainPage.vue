@@ -78,7 +78,7 @@ import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import { data } from './data'
-import BookForm from '../BookForm'
+import BookForm from '@/components/BookForm'
 
 const searchCriteria = ref({ title: '', author: '', genre: '' })
 const selectedBook = ref(null)
