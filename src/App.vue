@@ -55,7 +55,6 @@ const items = ref([
 ])
 
 const restoreAuthState = () => {
-  debugger
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true'
   authStore.setAuthenticated(isAuthenticated)
 }

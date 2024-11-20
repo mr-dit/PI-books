@@ -132,13 +132,6 @@ const onFormSubmit = async (c, form) => {
     authStore.setAuthenticated(false)
   }
 }
-
-// const username = ref('')
-// const password = ref('')
-
-const onLogin = async () => {
-  debugger
-}
 </script>
 
 <style lang="scss" scoped></style>
