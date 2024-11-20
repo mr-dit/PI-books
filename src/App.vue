@@ -20,12 +20,16 @@ const items = ref([
       },
       {
         label: 'Выход',
-        icon: 'pi pi-server'
+        icon: 'pi pi-server',
+        command: () => {
+          window.close()
+        }
       },
       {
         label: 'Закрыть',
         command: () => {
-          window.close()
+          // TODO добавить метод выхода с бэка
+          authStore.setAuthenticated(false)
         }
       }
     ]
