@@ -2,8 +2,12 @@
 import { ref } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import Menubar from 'primevue/menubar'
+import { useAuthStore } from '@/stores/auth'
 
 import './assets/tailwind.css'
+import LoginForm from '@/views/LoginForm'
+
+const authStore = useAuthStore()
 
 const items = ref([
   {
@@ -45,10 +49,19 @@ const items = ref([
     ]
   }
 ])
+
+const restoreAuthState = () => {
+  debugger
+  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true'
+  authStore.setAuthenticated(isAuthenticated)
+}
+
+restoreAuthState()
 </script>
 
 <template>
-  <div class="h-screen w-screen flex overflow-hidden flex-col">
+  <LoginForm v-if="!authStore.isAuthenticated"></LoginForm>
+  <div v-else class="h-screen w-screen flex overflow-hidden flex-col">
     <Menubar :model="items"></Menubar>
     <RouterView />
   </div>
