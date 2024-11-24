@@ -1,22 +1,7 @@
 <template>
   <div class="h-screen w-screen flex overflow-hidden">
     <!-- Панель поиска -->
-    <div class="w-1/4 h-full p-4 surface-border overflow-y-auto">
-      <h2 class="text-primary font-bold text-lg mb-4">Поиск книг</h2>
-      <div class="mb-4">
-        <label for="title" class="block text-secondary font-semibold mb-2">Заголовок</label>
-        <InputText id="title" v-model="searchCriteria.title" class="w-full" />
-      </div>
-      <div class="mb-4">
-        <label for="author" class="block text-secondary font-semibold mb-2">Автор</label>
-        <InputText id="author" v-model="searchCriteria.author" class="w-full" />
-      </div>
-      <div class="mb-4">
-        <label for="genre" class="block text-secondary font-semibold mb-2">Жанр</label>
-        <InputText id="genre" v-model="searchCriteria.genre" class="w-full" />
-      </div>
-      <Button label="Поиск" icon="pi pi-search" @click="performSearch" class="w-full p-button" />
-    </div>
+    <FilterMenu :inputs="inputs" @search="onSearch" />
 
     <!-- Результаты поиска и подробная информация -->
     <div class="w-3/4 h-full p-4 flex flex-col">
@@ -36,7 +21,7 @@
         :selection="selectedBook"
         @selection-change="onSelectBook"
         class="flex-grow mb-4"
-        style="min-height: 0"
+        :style="{ 'min-height': 0, 'min-width': 'auto' }"
       >
         <Column field="title" header="Название"></Column>
         <Column field="authors" header="Авторы"></Column>
@@ -77,10 +62,10 @@ import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-import { data } from './data'
+import { data, inputs } from './data'
 import BookForm from '@/components/BookForm'
+import FilterMenu from '@/components/FilterMenu'
 
-const searchCriteria = ref({ title: '', author: '', genre: '' })
 const selectedBook = ref(null)
 const rowsPerPage = 50
 const currentPage = ref(1)
@@ -91,20 +76,9 @@ const books = ref(data)
 
 const totalPages = computed(() => Math.ceil(books.value.length / rowsPerPage))
 
-// Фильтрация книг по критериям поиска
-const filteredBooks = computed(() =>
-  books.value.filter(
-    (book) =>
-      (!searchCriteria.value.title ||
-        book.title.toLowerCase().includes(searchCriteria.value.title.toLowerCase())) &&
-      (!searchCriteria.value.author ||
-        book.authors.some((author) =>
-          author.toLowerCase().includes(searchCriteria.value.author.toLowerCase())
-        )) &&
-      (!searchCriteria.value.genre ||
-        book.genre.toLowerCase().includes(searchCriteria.value.genre.toLowerCase()))
-  )
-)
+const onSearch = (data) => {
+  console.log(data)
+}
 
 // Логика для страницы и пагинации
 const firstRow = computed(() => (currentPage.value - 1) * rowsPerPage)
@@ -139,6 +113,7 @@ function goToPage(e) {
     currentPage.value = val
   }
 }
+// ------------
 
 function onSelectBook(book) {
   selectedBook.value = book
@@ -152,5 +127,8 @@ function performSearch() {
 <style scoped>
 :deep(.p-datatable-paginator-bottom) {
   display: none;
+}
+:deep(.p-datatable-table) {
+  min-width: auto !important;
 }
 </style>
