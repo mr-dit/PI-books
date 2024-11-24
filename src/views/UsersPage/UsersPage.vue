@@ -1,10 +1,17 @@
 <template>
   <div class="h-screen w-screen flex overflow-hidden">
     <!-- Панель поиска -->
-    <FilterMenu :inputs="inputs" @search="onSearch" />
+    <FilterMenu :inputs="inputs" @search="onSearch">
+      <template #footer>
+        <div class="flex justify-between gap-2">
+          <Button label="Редактировать" @click="onEditUser" />
+          <Button label="Добавить" @click="onAddUser" />
+        </div>
+      </template>
+    </FilterMenu>
 
     <!-- Результаты поиска и подробная информация -->
-    <div class="w-3/4 h-full p-4 flex flex-col">
+    <div class="card w-3/4 h-full p-4 flex flex-col">
       <h2 class="font-bold text-lg mb-4">Результаты поиска</h2>
 
       <!-- Таблица с результатами -->
@@ -18,8 +25,8 @@
         :first="firstRow"
         @page="onPageChange"
         selectionMode="single"
-        :selection="selectedBook"
-        @selection-change="onSelectBook"
+        v-model:selection="selectedRow"
+        @row-select="onSelectBook"
         class="flex-grow mb-4"
         :style="{ 'min-height': 0, 'min-width': 'auto' }"
       >
@@ -54,6 +61,21 @@
       </DataTable>
     </div>
   </div>
+  <Dialog
+    v-model:visible="isDialogVisible"
+    modal
+    :header="dialogHeader"
+    :style="{ width: '30rem' }"
+  >
+    <UserModal :user="selectedRow" @save="onUserSave" />
+    <!-- <template #footer>
+      <Button
+        label="Закрыть"
+        @click="isDialogVisible = false"
+        class="mt-4 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded"
+      />
+    </template> -->
+  </Dialog>
 </template>
 
 <script setup>
@@ -65,11 +87,15 @@ import Column from 'primevue/column'
 import { inputs } from './data'
 import FilterMenu from '@/components/FilterMenu'
 import api from '@/api'
+import UserModal from '@/components/UserModal'
 
-const selectedBook = ref(null)
+const selectedRow = ref(null)
 const rowsPerPage = 50
 const currentPage = ref(1)
 // const currentPage = ref('')
+
+const isDialogVisible = ref(false)
+const dialogHeader = ref('Создание клиента')
 
 // Моковые данные книг
 const data = ref([])
@@ -78,7 +104,7 @@ const totalPages = computed(() => Math.ceil(data.value.length / rowsPerPage))
 
 const onSearch = async (data) => {
   console.log(data)
-  await fetchUsers({ page: currentPage.value, size: rowsPerPage }, data)
+  await fetchUsers(undefined, data)
 }
 
 // Логика для страницы и пагинации
@@ -98,7 +124,7 @@ const previousPage = async () => {
 const nextPage = async () => {
   if (currentPage.value < totalPages.value) {
     currentPage.value++
-    await fetchUsers({ page: currentPage.value, size: rowsPerPage })
+    await fetchUsers()
   }
 }
 
@@ -115,33 +141,49 @@ const goToPage = async (e) => {
 
   if (val > 0 && val <= totalPages.value) {
     currentPage.value = val
-    await fetchUsers({ page: currentPage.value, size: rowsPerPage })
+    await fetchUsers()
   }
 }
 // ------------
 
 function onSelectBook(book) {
-  selectedBook.value = book
+  selectedRow.value = book.data
 }
 
 function performSearch() {
   currentPage.value = 1
 }
 
+const onEditUser = () => {
+  isDialogVisible.value = true
+  dialogHeader.value = 'Редактирование клиента'
+}
+const onAddUser = () => {
+  selectedRow.value = {}
+  isDialogVisible.value = true
+  dialogHeader.value = 'Создание клиента'
+}
+const onUserSave = async () => {
+  isDialogVisible.value = false
+  await fetchUsers()
+}
+
 const fetchUsers = async (
-  pagination = { page: currentPage.value, size: rowsPerPage },
+  pagination = { page: currentPage.value - 1, size: rowsPerPage, sort: 'id,asc' },
   params = {}
 ) => {
-  let url = 'customers'
+  let url = 'customers' + `?${new URLSearchParams(pagination).toString()}`
 
   if (Object.keys(params).length > 0) {
-    url += `?${new URLSearchParams(params).toString()}`
+    url += `&${new URLSearchParams(params).toString()}`
   }
-  url += `?${new URLSearchParams(pagination).toString()}`
 
   try {
     const res = await api.get(url)
-    data.value = res.data
+    console.log(res)
+    const page = res.data.page
+    totalPages.value = page.totalPages
+    data.value = res.data.content
   } catch (e) {
     console.log(e)
   }
