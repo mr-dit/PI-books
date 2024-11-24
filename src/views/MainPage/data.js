@@ -211,3 +211,9 @@ export const data = [
   }
   // Добавьте больше данных для демонстрации пагинации, если нужно
 ].map((book) => ({ ...book, authors: book.authors.join(',  ') }))
+
+export const inputs = [
+  { key: 'title', label: 'Название' },
+  { key: 'author', label: 'Автор' },
+  { key: 'subject', label: 'Жанр' }
+]

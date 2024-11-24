@@ -1,13 +1,15 @@
 <script setup>
 import { ref } from 'vue'
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterLink, RouterView, useRouter } from 'vue-router'
 import Menubar from 'primevue/menubar'
 import { useAuthStore } from '@/stores/auth'
+import api from '@/api'
 
 import './assets/tailwind.css'
 import LoginForm from '@/views/LoginForm'
 
 const authStore = useAuthStore()
+const router = useRouter()
 
 const items = ref([
   {
@@ -21,15 +23,21 @@ const items = ref([
       {
         label: 'Выход',
         icon: 'pi pi-server',
-        command: () => {
-          window.close()
+        command: async () => {
+          try {
+            await api.post('auth/logout')
+            authStore.setAuthenticated(false)
+          } catch (e) {
+            console.log(e)
+            authStore.setAuthenticated(false)
+          }
         }
       },
       {
         label: 'Закрыть',
         command: () => {
           // TODO добавить метод выхода с бэка
-          authStore.setAuthenticated(false)
+          window.close()
         }
       }
     ]
@@ -39,8 +47,18 @@ const items = ref([
     icon: 'pi pi-envelope',
     items: [
       {
+        label: 'Главная',
+        icon: 'pi pi-bolt',
+        command: async () => {
+          await router.push({ name: 'home' })
+        }
+      },
+      {
         label: 'Управление клиентами',
-        icon: 'pi pi-bolt'
+        icon: 'pi pi-bolt',
+        command: async () => {
+          await router.push({ name: 'customers' })
+        }
       },
       {
         label: 'Выдача книг',
@@ -54,12 +72,24 @@ const items = ref([
   }
 ])
 
-const restoreAuthState = () => {
-  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true'
-  authStore.setAuthenticated(isAuthenticated)
+// const restoreAuthState = () => {
+//   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true'
+//   authStore.setAuthenticated(isAuthenticated)
+// }
+// restoreAuthState()
+
+const checkAuth = async () => {
+  try {
+    const response = await api.get('/auth/check-you-is-live')
+    authStore.setAuthenticated(response.data)
+  } catch (error) {
+    authStore.setAuthenticated(false)
+    console.warn('Сессия недействительна:', error.response?.data || error.message)
+  }
 }
 
-restoreAuthState()
+// Проверяем авторизацию при загрузке страницы
+checkAuth()
 </script>
 
 <template>

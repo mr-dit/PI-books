@@ -9,6 +9,11 @@ const router = createRouter({
       component: () => import('@/views/MainPage')
     },
     {
+      path: '/customers',
+      name: 'customers',
+      component: () => import('@/views/UsersPage')
+    },
+    {
       path: '/auth',
       name: 'auth',
       component: () => import('@/views/LoginForm')
