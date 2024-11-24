@@ -21,7 +21,7 @@
         :paginator="true"
         :rows="rowsPerPage"
         scrollable
-        scrollHeight="85%"
+        scrollHeight="95%"
         :first="firstRow"
         @page="onPageChange"
         selectionMode="single"
