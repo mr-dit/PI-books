@@ -35,7 +35,7 @@
         >
         <!-- </template> -->
       </div>
-      <Button type="submit" severity="secondary" label="Submit" />
+      <Button type="submit" severity="secondary" label="Войти" />
     </Form>
   </div>
 
