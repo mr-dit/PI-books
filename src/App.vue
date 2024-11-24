@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterLink, RouterView, useRouter } from 'vue-router'
 import Menubar from 'primevue/menubar'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/api'
@@ -9,6 +9,7 @@ import './assets/tailwind.css'
 import LoginForm from '@/views/LoginForm'
 
 const authStore = useAuthStore()
+const router = useRouter()
 
 const items = ref([
   {
@@ -46,8 +47,18 @@ const items = ref([
     icon: 'pi pi-envelope',
     items: [
       {
+        label: 'Главная',
+        icon: 'pi pi-bolt',
+        command: async () => {
+          await router.push({ name: 'home' })
+        }
+      },
+      {
         label: 'Управление клиентами',
-        icon: 'pi pi-bolt'
+        icon: 'pi pi-bolt',
+        command: async () => {
+          await router.push({ name: 'customers' })
+        }
       },
       {
         label: 'Выдача книг',
@@ -69,8 +80,8 @@ const items = ref([
 
 const checkAuth = async () => {
   try {
-    const response = await api.get('/auth/check-is-you-live')
-    authStore.setAuthenticated(response)
+    const response = await api.get('/auth/check-you-is-live')
+    authStore.setAuthenticated(response.data)
   } catch (error) {
     authStore.setAuthenticated(false)
     console.warn('Сессия недействительна:', error.response?.data || error.message)
