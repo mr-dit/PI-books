@@ -35,7 +35,7 @@
         >
         <!-- </template> -->
       </div>
-      <Button type="submit" severity="secondary" label="Войти" />
+      <Button :disabled="btnDisabled" type="submit" severity="secondary" label="Войти" />
     </Form>
   </div>
 
@@ -115,11 +115,12 @@ const resolver = ref(
   )
 )
 
+const btnDisabled = ref(false)
 const onFormSubmit = async (c, form) => {
   console.log(c, form)
 
   if (!c.valid) return
-
+  btnDisabled.value = true
   try {
     const res = await api.post('auth/login', {
       username: c.values.login,
@@ -127,7 +128,9 @@ const onFormSubmit = async (c, form) => {
     })
     console.log(res)
     authStore.setAuthenticated(true)
+    btnDisabled.value = false
   } catch (e) {
+    btnDisabled.value = false
     console.log(e)
     authStore.setAuthenticated(false)
   }
