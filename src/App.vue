@@ -101,6 +101,9 @@ checkAuth()
 </template>
 
 <style scoped>
+:deep(.p-menubar-submenu) {
+  z-index: 2;
+}
 /* header {
   line-height: 1.5;
   max-height: 100vh;

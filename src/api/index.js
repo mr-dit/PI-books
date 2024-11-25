@@ -1,9 +1,8 @@
 import axios from 'axios'
 import { useAuthStore } from '@/stores/auth'
-const apiUrl = import.meta.env.VITE_BACKEND_API_URL
 
 const api = axios.create({
-  baseURL: apiUrl,
+  baseURL: '/books-api',
   withCredentials: true, // Отправка и получение cookies
   headers: {
     'Content-Type': 'application/json'
