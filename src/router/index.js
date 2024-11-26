@@ -27,6 +27,11 @@ const router = createRouter({
       path: '/author',
       name: 'author',
       component: () => import('@/components/AuthorInfo')
+    },
+    {
+      path: '/book_control',
+      name: 'book_control',
+      component: () => import('@/components/BookControl')
     }
   ]
 })

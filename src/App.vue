@@ -62,7 +62,10 @@ const items = ref([
       },
       {
         label: 'Выдача книг',
-        icon: 'pi pi-server'
+        icon: 'pi pi-server',
+        command: async () => {
+          await router.push({ name: 'book_control' })
+        }
       },
       {
         label: 'Отчеты',
