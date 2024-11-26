@@ -61,15 +61,15 @@
           >
             <Column field="customer" header="Клиент" sortable></Column>
             <Column field="dateOfIssue" header="Дата выдачи" sortable></Column>
-            <Column header="Дата сдачи" sortable>
-              <!-- <template #body="slotProps">
+            <Column field="returnDate" header="Дата сдачи" sortable>
+              <template #body="slotProps">
                 <span v-if="slotProps.data.overdue" class="text-red-500 font-bold">
                   {{ slotProps.data.returnDate }}
                 </span>
                 <span v-else>
                   {{ slotProps.data.returnDate }}
                 </span>
-              </template> -->
+              </template>
             </Column>
           </DataTable>
         </TabPanel>
@@ -118,7 +118,7 @@ const fetchBookHistory = () => {
           customer: 'Grace Bridges',
           dateOfIssue: '26.05.17',
           returnDate: '16.06.17',
-          overdue: false,
+          overdue: true,
         },
         {
           customer: 'Bianca Mendoza',
