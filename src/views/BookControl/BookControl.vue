@@ -17,7 +17,7 @@
     <div class="card w-3/4 h-full p-4 flex flex-col">
       <!-- Выдача / Возврат -->
       <div class="border rounded-lg p-4 shadow-md">
-        <h3 class="text-lg font-semibold mb-2">Выдача / Возврат</h3>
+        <h3 class="text-lg font-semibold mb-2">Выдача и возврат</h3>
         <p class="text font-semibold mb-2">Идентификатор книги</p>
         <div class="flex flex-col gap-2">
           <input
@@ -66,8 +66,10 @@
             <Column field="name" header="Дата выдачи"></Column>
             <Column field="address" header="Срок сдачи"></Column>
           </DataTable>
+          <div class="flex flex-col mt-4">
+            <button class="bg-white/10 hover:bg-white/20 text-primary-50 px-3 py-1 rounded" @click="renewBook">Обновить</button>
+          </div>
         </div>
-        <button class="bg-white/10 hover:bg-white/20 text-primary-50 px-3 py-1 rounded" @click="renewBook">Обновить</button>
       </div>
 
       <!-- История -->

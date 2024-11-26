@@ -64,12 +64,15 @@ const items = ref([
         label: 'Выдача книг',
         icon: 'pi pi-server',
         command: async () => {
-          await router.push({ name: 'book_control' })
+          await router.push({ name: 'books_control' })
         }
       },
       {
         label: 'Отчеты',
-        icon: 'pi pi-pencil'
+        icon: 'pi pi-pencil',
+        command: async () => {
+          await router.push({ name: 'report' })
+        }
       }
     ]
   }
