@@ -2,7 +2,7 @@
   <div class="flex items-end rounded-lg w-full mx-auto mt-4">
     <Form
       v-slot="$form"
-      :initialValues
+      :initialValues="initialValues"
       @submit="(e) => onFormSubmit(e, $form)"
       class="flex flex-col gap-4 w-full"
     >
