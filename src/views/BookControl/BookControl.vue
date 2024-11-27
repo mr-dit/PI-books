@@ -59,7 +59,19 @@
           >
             <Column field="bookTitle" header="Название"></Column>
             <Column field="dateOfIssue" header="Дата выдачи"></Column>
-            <Column field="returnDueDate" header="Срок сдачи"></Column>
+            <Column field="returnDueDate" header="Срок сдачи">
+              <template #body="slotProps">
+                <span
+                  v-if="new Date(slotProps.data.returnDueDate) <= new Date()"
+                  class="text-red-500 font-bold"
+                >
+                  {{ slotProps.data.returnDueDate }}
+                </span>
+                <span v-else>
+                  {{ slotProps.data.returnDueDate }}
+                </span>
+              </template>
+            </Column>
           </DataTable>
           <div class="flex flex-col mt-4">
             <Button
@@ -89,7 +101,17 @@
         >
           <Column field="bookTitle" header="Название"></Column>
           <Column field="dateOfIssue" header="Дата выдачи"></Column>
-          <Column field="returnDate" header="Дата сдачи"></Column>
+          <Column field="returnDate" header="Дата сдачи">
+            <span
+              v-if="new Date(slotProps.data.returnDate) > new Date(slotProps.data.returnDueDate)"
+              class="text-red-500 font-bold"
+            >
+              {{ slotProps.data.returnDate }}
+            </span>
+            <span v-else>
+              {{ slotProps.data.returnDate }}
+            </span></Column
+          >
         </DataTable>
       </div>
     </div>
