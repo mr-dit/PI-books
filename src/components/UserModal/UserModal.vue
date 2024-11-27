@@ -2,24 +2,31 @@
   <div class="flex items-end rounded-lg w-full mx-auto mt-4">
     <Form
       v-slot="$form"
-      :initialValues
+      :initialValues="initialValues"
       @submit="(e) => onFormSubmit(e, $form)"
       class="flex flex-col gap-4 w-full"
     >
       <div class="flex flex-col gap-1">
         <label>
           Имя
-          <InputText id="name" name="name" placeholder="Имя" :feedback="false" fluid />
+          <InputText id="name" name="name" placeholder="Имя" required :feedback="false" fluid />
         </label>
         <label>
           Адрес
-          <InputText id="address" name="address" placeholder="Адрес" :feedback="false" fluid />
+          <InputText
+            id="address"
+            name="address"
+            placeholder="Адрес"
+            required
+            :feedback="false"
+            fluid
+          />
         </label>
         <label>
           Индекс\Город
           <div class="flex gap-1">
-            <InputText id="zip" name="zip" placeholder="Индекс" :feedback="false" fluid />
-            <InputText id="city" name="city" placeholder="Город" :feedback="false" fluid />
+            <InputText id="zip" name="zip" placeholder="Индекс" required :feedback="false" fluid />
+            <InputText id="city" name="city" placeholder="Город" required :feedback="false" fluid />
           </div>
         </label>
         <!-- <template v-if="$form.password?.invalid"> -->
@@ -71,10 +78,8 @@ const props = defineProps({
 
 const emit = defineEmits(['save', 'cancel'])
 
-// const localSelectedAuthor = ref(props.selectedAuthor)e
 const initialValues = ref(props.user)
 
-// Слежение за изменением selectedAuthor из родителя
 watch(
   () => props.user,
   (val) => {
@@ -113,6 +118,4 @@ const onFormSubmit = async (c, form) => {
 }
 </script>
 
-<style scoped>
-/* Добавьте ваши стили */
-</style>
+<style scoped></style>

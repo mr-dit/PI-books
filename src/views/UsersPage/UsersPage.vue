@@ -117,7 +117,7 @@ function onPageChange(event) {
 const previousPage = async () => {
   if (currentPage.value > 1) {
     currentPage.value--
-    await fetchUsers({ page: currentPage.value, size: rowsPerPage })
+    await fetchUsers()
   }
 }
 

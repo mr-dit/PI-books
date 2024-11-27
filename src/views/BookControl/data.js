@@ -1,4 +1,4 @@
 export const inputs = [
     { key: 'id', label: 'Номер пользователя' },
-    { key: 'name', label: 'Имя' }
+    // { key: 'name', label: 'Имя' }
 ]  
