@@ -28,11 +28,9 @@
         <template #footer>
           <div class="flex items-center gap-2 mb-4">
             Страница
-            <Button
-              icon="pi pi-chevron-left"
-              @click="previousPage"
-              :disabled="currentPage <= 1"
-            ></Button>
+            <Button icon="pi pi-chevron-left" @click="previousPage" :disabled="currentPage <= 1"
+              ><</Button
+            >
             <span>
               <InputText
                 type="number"
