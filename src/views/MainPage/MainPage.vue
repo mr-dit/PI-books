@@ -9,7 +9,7 @@
 
       <!-- Таблица с результатами -->
       <DataTable
-        :value="books"
+        :value="data"
         tableStyle="min-width: 50rem"
         :paginator="true"
         :rows="rowsPerPage"
@@ -18,13 +18,13 @@
         :first="firstRow"
         @page="onPageChange"
         selectionMode="single"
-        :selection="selectedBook"
-        @selection-change="onSelectBook"
+        v-model:selection="selectedRow"
+        @row-select="onSelectBook"
         class="flex-grow mb-4"
         :style="{ 'min-height': 0, 'min-width': 'auto' }"
       >
         <Column field="title" header="Название"></Column>
-        <Column field="authors" header="Авторы"></Column>
+        <Column field="authorsString" header="Авторы"></Column>
         <template #footer>
           <div class="flex items-center gap-2 mb-4">
             Страница
@@ -51,48 +51,53 @@
       </DataTable>
 
       <!-- Подробная информация о книге -->
-      <BookForm></BookForm>
+      <BookForm v-if="hasBookForm" :book="bookForm"></BookForm>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
-import InputText from 'primevue/inputtext'
-import Button from 'primevue/button'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import { data, inputs } from './data'
+import { inputs } from './data'
 import BookForm from '@/components/BookForm'
 import FilterMenu from '@/components/FilterMenu'
+import api from '@/api'
 
-const selectedBook = ref(null)
+const selectedRow = ref(null)
 const rowsPerPage = 50
 const currentPage = ref(1)
 // const currentPage = ref('')
 
 // Моковые данные книг
-const books = ref(data)
+const data = ref([])
 
-const totalPages = computed(() => Math.ceil(books.value.length / rowsPerPage))
+const totalPages = computed(() => Math.ceil(data.value.length / rowsPerPage))
+const hasBookForm = computed(() => Object.keys(bookForm.value).length > 0)
 
-const onSearch = (data) => {
+const onSearch = async (data) => {
   console.log(data)
+  await fetchBooks(undefined, data)
 }
 
 // Логика для страницы и пагинации
 const firstRow = computed(() => (currentPage.value - 1) * rowsPerPage)
 
-function onPageChange(event) {
+const onPageChange = (event) => {
   currentPage.value = event.page + 1
 }
 
-function previousPage() {
-  if (currentPage.value > 1) currentPage.value--
+const previousPage = async () => {
+  if (currentPage.value > 1) {
+    currentPage.value--
+    await fetchBooks()
+  }
 }
 
-function nextPage() {
-  if (currentPage.value < totalPages.value) currentPage.value++
+const nextPage = async () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++
+    await fetchBooks()
+  }
 }
 
 const validatePagination = (e) => {
@@ -105,23 +110,55 @@ const validatePagination = (e) => {
   }
 }
 
-function goToPage(e) {
+const goToPage = async (e) => {
   console.log(e.target.value)
   const val = e.target.value
 
   if (val > 0 && val <= totalPages.value) {
     currentPage.value = val
+    await fetchBooks()
   }
 }
 // ------------
+const bookForm = ref({})
 
-function onSelectBook(book) {
-  selectedBook.value = book
+const onSelectBook = async (book) => {
+  console.log(book.data)
+  const data = book.data
+
+  selectedRow.value = data
+
+  const res = await api.get(`books/${data.id}`)
+  bookForm.value = res.data
 }
 
 function performSearch() {
   currentPage.value = 1
 }
+
+const fetchBooks = async (
+  pagination = { page: currentPage.value - 1, size: rowsPerPage },
+  params = {}
+) => {
+  let url = 'books' + `?${new URLSearchParams(pagination).toString()}`
+
+  if (Object.keys(params).length > 0) {
+    url += `&${new URLSearchParams(params).toString()}`
+  }
+
+  try {
+    const res = await api.get(url)
+    const content = res.data.content.map((item) => ({
+      ...item,
+      authorsString: item.authors.map((author) => author.name).join(', ')
+    }))
+    data.value = content
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+fetchBooks()
 </script>
 
 <style scoped>
