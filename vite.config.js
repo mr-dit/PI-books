@@ -28,5 +28,14 @@ export default defineConfig({
         secure: false
       }
     }
+  },
+  preview: {
+    proxy: {
+      '/books-api': {
+        target: 'http://188.120.243.137:8090',
+        changeOrigin: true,
+        secure: false
+      }
+    }
   }
 })
