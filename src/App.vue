@@ -99,6 +99,7 @@ checkAuth()
 </script>
 
 <template>
+  <Toast />
   <LoginForm v-if="!authStore.isAuthenticated"></LoginForm>
   <div v-else class="h-screen w-screen flex overflow-hidden flex-col">
     <Menubar :model="items"></Menubar>

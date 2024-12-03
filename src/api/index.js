@@ -2,7 +2,7 @@ import axios from 'axios'
 import { useAuthStore } from '@/stores/auth'
 
 const api = axios.create({
-  baseURL: '/books-api',
+  baseURL: '/books-api/',
   withCredentials: true, // Отправка и получение cookies
   headers: {
     'Content-Type': 'application/json'

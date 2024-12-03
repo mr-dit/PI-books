@@ -18,8 +18,6 @@
       <DataTable
         :value="data"
         tableStyle="min-width: 50rem"
-        :paginator="true"
-        :rows="rowsPerPage"
         scrollable
         scrollHeight="95%"
         :first="firstRow"
@@ -44,6 +42,7 @@
             <span>
               <InputText
                 type="number"
+                :disabled="totalPages <= 1"
                 :value="currentPage"
                 @input="validatePagination"
                 @keydown.enter="goToPage"
@@ -88,10 +87,10 @@ import { inputs } from './data'
 import FilterMenu from '@/components/FilterMenu'
 import api from '@/api'
 import UserModal from '@/components/UserModal'
+import { useToast } from 'primevue/usetoast'
 
-const selectedRow = ref(null)
-const rowsPerPage = 50
-const currentPage = ref(1)
+const toast = useToast()
+
 // const currentPage = ref('')
 
 const isDialogVisible = ref(false)
@@ -100,14 +99,18 @@ const dialogHeader = ref('Создание клиента')
 // Моковые данные книг
 const data = ref([])
 
-const totalPages = computed(() => Math.ceil(data.value.length / rowsPerPage))
-
 const onSearch = async (data) => {
   console.log(data)
   await fetchUsers(undefined, data)
 }
 
 // Логика для страницы и пагинации
+const selectedRow = ref({})
+const rowsPerPage = 5
+const currentPage = ref(1)
+
+const totalPages = ref(Math.ceil(data.value.length / rowsPerPage))
+
 const firstRow = computed(() => (currentPage.value - 1) * rowsPerPage)
 
 function onPageChange(event) {
@@ -155,6 +158,16 @@ function performSearch() {
 }
 
 const onEditUser = () => {
+  if (!Object.keys(selectedRow.value).length) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Клиент не выбран',
+      life: 4000
+    })
+    return
+  }
+
   isDialogVisible.value = true
   dialogHeader.value = 'Редактирование клиента'
 }

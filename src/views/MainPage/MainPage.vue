@@ -11,8 +11,6 @@
       <DataTable
         :value="data"
         tableStyle="min-width: 50rem"
-        :paginator="true"
-        :rows="rowsPerPage"
         scrollable
         scrollHeight="85%"
         :first="firstRow"
@@ -34,6 +32,7 @@
             <span>
               <InputText
                 type="number"
+                :disabled="totalPages <= 1"
                 :value="currentPage"
                 @input="validatePagination"
                 @keydown.enter="goToPage"
