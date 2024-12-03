@@ -1,7 +1,5 @@
 <template>
   <div class="card flex justify-center">
-    <Toast />
-
     <Form
       v-slot="$form"
       :resolver
@@ -84,9 +82,9 @@ import api from '@/api'
 import { Form } from '@primevue/forms'
 
 import { zodResolver } from '@primevue/forms/resolvers/zod'
-import { useToast } from 'primevue/usetoast'
 import { z } from 'zod'
 import { useAuthStore } from '@/stores/auth'
+import { useToast } from 'primevue/usetoast'
 
 const toast = useToast()
 
@@ -133,6 +131,12 @@ const onFormSubmit = async (c, form) => {
     btnDisabled.value = false
     console.log(e)
     authStore.setAuthenticated(false)
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Неправильный логин или пароль',
+      life: 3000
+    })
   }
 }
 </script>

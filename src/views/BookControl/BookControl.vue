@@ -73,14 +73,14 @@
               </template>
             </Column>
           </DataTable>
-          <div class="flex flex-col mt-4">
+          <!-- <div class="flex flex-col mt-4">
             <Button
               class="bg-white/10 hover:bg-white/20 text-primary-50 px-3 py-1 rounded"
               @click="renewBook"
             >
               Обновить
             </Button>
-          </div>
+          </div> -->
         </div>
       </div>
 

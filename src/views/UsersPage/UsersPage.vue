@@ -87,6 +87,9 @@ import { inputs } from './data'
 import FilterMenu from '@/components/FilterMenu'
 import api from '@/api'
 import UserModal from '@/components/UserModal'
+import { useToast } from 'primevue/usetoast'
+
+const toast = useToast()
 
 // const currentPage = ref('')
 
@@ -102,7 +105,7 @@ const onSearch = async (data) => {
 }
 
 // Логика для страницы и пагинации
-const selectedRow = ref(null)
+const selectedRow = ref({})
 const rowsPerPage = 5
 const currentPage = ref(1)
 
@@ -155,6 +158,16 @@ function performSearch() {
 }
 
 const onEditUser = () => {
+  if (!Object.keys(selectedRow.value).length) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Клиент не выбран',
+      life: 4000
+    })
+    return
+  }
+
   isDialogVisible.value = true
   dialogHeader.value = 'Редактирование клиента'
 }
