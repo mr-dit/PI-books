@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen w-screen flex overflow-hidden">
+  <div class="h-screen w-screen flex overflow-auto">
     <!-- Панель поиска -->
     <FilterMenu :inputs="inputs" @search="onSearch">
       <template #footer>
@@ -90,8 +90,6 @@
         <DataTable
           :value="histories"
           tableStyle="min-width: 50rem"
-          :paginator="true"
-          :rows="5"
           scrollable
           scrollHeight="300px"
           selectionMode="single"
@@ -112,6 +110,30 @@
               {{ slotProps.data.returnDate }}
             </span></Column
           >
+          <template #footer>
+            <div class="flex items-center gap-2 mb-4">
+              Страница
+              <Button icon="pi pi-chevron-left" @click="previousPage" :disabled="currentPage <= 1"
+                ><</Button
+              >
+              <span>
+                <InputText
+                  type="number"
+                  :value="currentPage"
+                  :disabled="totalPages <= 1"
+                  @input="validatePagination"
+                  @keydown.enter="goToPage"
+                  class="w-20"
+              /></span>
+              <Button
+                icon="pi pi-chevron-right"
+                @click="nextPage"
+                :disabled="currentPage >= totalPages"
+                >></Button
+              >
+              из {{ totalPages }}
+            </div>
+          </template>
         </DataTable>
       </div>
     </div>
@@ -154,6 +176,54 @@ const findIssue = computed(() =>
 
 const canIssue = computed(() => bookTitle.value !== '' && !findIssue.value)
 const canReturn = computed(() => bookTitle.value !== '' && !canIssue.value)
+
+// Логика для страницы и пагинации
+const selectedRow = ref(null)
+const rowsPerPage = 5
+const currentPage = ref(1)
+
+const totalPages = ref(Math.ceil(histories.value.length / rowsPerPage))
+
+const firstRow = computed(() => (currentPage.value - 1) * rowsPerPage)
+
+function onPageChange(event) {
+  currentPage.value = event.page + 1
+}
+
+const previousPage = async () => {
+  if (currentPage.value > 1) {
+    currentPage.value--
+    const resHistories = await fetchCustomerHistory()
+    histories.value = resHistories
+  }
+}
+
+const nextPage = async () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++
+    const resHistories = await fetchCustomerHistory()
+    histories.value = resHistories
+  }
+}
+
+const validatePagination = (e) => {
+  const val = e.target.value
+  if (val > 0 && val <= totalPages.value) {
+    currentPage.value = val
+  }
+}
+
+const goToPage = async (e) => {
+  console.log(e.target.value)
+  const val = e.target.value
+
+  if (val > 0 && val <= totalPages.value) {
+    currentPage.value = val
+    const resHistories = await fetchCustomerHistory()
+    histories.value = resHistories
+  }
+}
+// ------------
 
 const updateHistories = async (id = selectedClient.value.id) => {
   if (!id) return
@@ -270,12 +340,13 @@ const fetchCurrIssues = async (
 }
 
 const fetchCustomerHistory = async (
-  id,
-  // pagination = { page: currentPage.value - 1, size: rowsPerPage, sort: 'id,asc' },
+  id = selectedClient.value.id,
+  pagination = { page: currentPage.value - 1, size: rowsPerPage, sort: 'id,asc' },
   params = {}
 ) => {
-  let url = `history/customerHistory/${id}`
-  // + `?${new URLSearchParams(pagination).toString()}`
+  if (!id) return
+
+  let url = `history/customerHistory/${id}` + `?${new URLSearchParams(pagination).toString()}`
 
   if (Object.keys(params).length > 0) {
     url += `&${new URLSearchParams(params).toString()}`
@@ -284,8 +355,8 @@ const fetchCustomerHistory = async (
   try {
     const res = await api.get(url)
     console.log(res)
-    // const page = res.data.page
-    // totalPages.value = page.totalPages
+    const page = res.data.page
+    totalPages.value = page.totalPages
     return res.data.content
   } catch (e) {
     console.log(e)

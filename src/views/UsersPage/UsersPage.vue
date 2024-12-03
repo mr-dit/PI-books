@@ -18,8 +18,6 @@
       <DataTable
         :value="data"
         tableStyle="min-width: 50rem"
-        :paginator="true"
-        :rows="rowsPerPage"
         scrollable
         scrollHeight="95%"
         :first="firstRow"
@@ -44,6 +42,7 @@
             <span>
               <InputText
                 type="number"
+                :disabled="totalPages <= 1"
                 :value="currentPage"
                 @input="validatePagination"
                 @keydown.enter="goToPage"
@@ -89,9 +88,6 @@ import FilterMenu from '@/components/FilterMenu'
 import api from '@/api'
 import UserModal from '@/components/UserModal'
 
-const selectedRow = ref(null)
-const rowsPerPage = 50
-const currentPage = ref(1)
 // const currentPage = ref('')
 
 const isDialogVisible = ref(false)
@@ -100,14 +96,18 @@ const dialogHeader = ref('Создание клиента')
 // Моковые данные книг
 const data = ref([])
 
-const totalPages = computed(() => Math.ceil(data.value.length / rowsPerPage))
-
 const onSearch = async (data) => {
   console.log(data)
   await fetchUsers(undefined, data)
 }
 
 // Логика для страницы и пагинации
+const selectedRow = ref(null)
+const rowsPerPage = 5
+const currentPage = ref(1)
+
+const totalPages = ref(Math.ceil(data.value.length / rowsPerPage))
+
 const firstRow = computed(() => (currentPage.value - 1) * rowsPerPage)
 
 function onPageChange(event) {
