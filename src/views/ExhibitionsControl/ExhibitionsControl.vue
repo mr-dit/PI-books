@@ -1,59 +1,68 @@
 <template>
     <div class="h-screen w-screen flex overflow-auto">
-    <!-- Панель поиска -->
-    <FilterMenu :inputs="inputs" @search="onSearch">
-        <template #footer>
-        <div class="flex justify-end flex-col">
-            <Button label="Редактировать" @click="onEditUser" />
-        </div>
-        </template>
-    </FilterMenu>
-    <div class="w-3/4 h-full p-4 flex flex-col">
-        <div class="rounded-lg p-4 shadow-md">
-        <h3 class="font-bold text-lg mb-4">Список выставок</h3>
-        <DataTable
-            :value="data"
-            tableStyle="min-width: 50rem"
-            scrollable
-            scrollHeight="95%"
-            :first="firstRow"
-            @page="onPageChange"
-            selectionMode="single"
-            v-model:selection="selectedRow"
-            @row-select="onSelectBook"
-            class="flex-grow mb-4"
-            :style="{ 'min-height': 0, 'min-width': 'auto' }"
-        >
-            <Column field="name" header="Название" sortable></Column>
-            <Column field="startDate" header="Дата начала" sortable></Column>
-            <Column field="endDate" header="Дата окончания" sortable></Column>
+        <!-- Панель поиска -->
+        <FilterMenu :inputs="inputs" @search="onSearch">
             <template #footer>
+            <div class="flex justify-end flex-col">
+                <Button label="Редактировать" @click="onEditUser" />
+            </div>
+            </template>
+        </FilterMenu>
+        <div class="w-3/4 h-full p-4 flex flex-col">
+            <div class="rounded-lg p-4 shadow-md">
+            <h3 class="font-bold text-lg mb-4">Список выставок</h3>
+            <DataTable
+                :value="data"
+                tableStyle="min-width: 50rem"
+                scrollable
+                scrollHeight="95%"
+                :first="firstRow"
+                @page="onPageChange"
+                selectionMode="single"
+                v-model:selection="selectedRow"
+                @row-select="onSelectBook"
+                class="flex-grow mb-4"
+                :style="{ 'min-height': 0, 'min-width': 'auto' }"
+            >
+                <Column field="name" header="Название" sortable></Column>
+                <Column field="startDate" header="Дата начала" sortable></Column>
+                <Column field="endDate" header="Дата окончания" sortable></Column>
+                <template #footer>
                 <div class="flex items-center gap-2 mb-4">
-            Страница
-            <Button icon="pi pi-chevron-left" @click="previousPage" :disabled="currentPage <= 1"
-            >></Button
-            >
-            <span>
-            <InputText
-                type="number"
-                :disabled="totalPages <= 1"
-                :value="currentPage"
-                @input="validatePagination"
-                @keydown.enter="goToPage"
-                class="w-20"
-            /></span>
-            <Button
-            icon="pi pi-chevron-right"
-            @click="nextPage"
-            :disabled="currentPage >= totalPages"
-            >></Button
-            >
-            из {{ totalPages }}
+                    Страница
+                    <Button icon="pi pi-chevron-left" @click="previousPage" :disabled="currentPage <= 1"
+                    >></Button
+                    >
+                    <span>
+                        <InputText
+                        type="number"
+                        :disabled="totalPages <= 1"
+                        :value="currentPage"
+                        @input="validatePagination"
+                        @keydown.enter="goToPage"
+                        class="w-20"
+                    /></span>
+                    <Button
+                    icon="pi pi-chevron-right"
+                    @click="nextPage"
+                    :disabled="currentPage >= totalPages"
+                    >></Button
+                    >
+                    из {{ totalPages }}
+                </div>
+            </template>
+            </DataTable>
+            </div>
+            <div class="flex flex-row gap-2 mt-4">
+                <Button class="w-[150px]" :disabled="!canIssue" @click="issueBook"> Редактировать </Button>
+                <Button class="w-[150px]" :disabled="!canReturn" @click="returnBook">
+                    Просмотреть
+                </Button>
+                <Button class="w-[150px]" :disabled="!canReturn" @click="returnBook">
+                    Удалить
+                </Button>
+            </div>
         </div>
-        </template>
-        </DataTable>
-        </div>
-    </div>
     </div>
 </template>
 
