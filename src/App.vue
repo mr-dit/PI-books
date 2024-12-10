@@ -75,6 +75,13 @@ const items = ref([
         }
       }
     ]
+  },
+  {
+    label: 'Выставка',
+    icon: '',
+    command: async () => {
+          await router.push({ name: 'exhibitions_control' })
+        }
   }
 ])
 
