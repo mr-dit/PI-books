@@ -1,7 +1,7 @@
 <template>
   <div class="w-1/4 h-full flex flex-col justify-between p-4 surface-border overflow-y-auto">
     <div>
-      <h2 class="text-primary font-bold text-lg mb-4">Поиск книг</h2>
+      <h2 class="text-primary font-bold text-lg mb-4">{{ props.title }}</h2>
       <div v-for="(input, index) in inputs" :key="index" class="mb-4">
         <label :for="input.key" class="block text-secondary font-semibold mb-2">
           {{ input.label }}
@@ -18,6 +18,10 @@
 import { reactive, computed } from 'vue'
 
 const props = defineProps({
+  title: {
+    type: String,
+    default: 'Поиск книг'
+  },
   inputs: {
     type: Array,
     required: true,
