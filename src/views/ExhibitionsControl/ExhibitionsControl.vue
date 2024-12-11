@@ -54,9 +54,9 @@
             </DataTable>
             </div>
             <div class="flex flex-row gap-2 mt-4">
-                <Button class="w-[150px]" :disabled="!canIssue" @click="issueBook"> Редактировать </Button>
+                <Button class="w-[150px]" :disabled="!selectedRow" @click="viewExhibition"> Просмотреть </Button>
                 <Button class="w-[150px]" :disabled="!canReturn" @click="returnBook">
-                    Просмотреть
+                    Редактировать
                 </Button>
                 <Button class="w-[150px]" :disabled="!canReturn" @click="returnBook">
                     Удалить
@@ -71,15 +71,18 @@ import { ref, computed, onMounted } from 'vue';
 import { inputs } from './data';
 import FilterMenu from '@/components/FilterMenu';
 import api from '@/api';
+import ExhibitionInfo from '@/components/ExhibitionInfo/ExhibitionInfo.vue';
 
 const data = ref([]); // Полный список выставок
 const filteredExhibitions = ref([]); // Отфильтрованные выставки
-const selectedExhibition = ref(null); // Выбранная выставка
+const selectedExhibition = ref(null); 
 const filters = ref({
     name: '',
     startDate: '',
     endDate: '',
 }); // Фильтры для поиска
+const isBookModalVisible = ref(false); // Видимость модального окна книги
+const books = ref([]); // Книги, относящиеся к выбранной выставке
 
 const selectedRow = ref(null)
 const rowsPerPage = 10
@@ -92,8 +95,7 @@ const onSearch = async (data) => {
     await fetchExhibitions(undefined, data)
 }
 
-    // Логика для страницы и пагинации
-
+// Логика для страницы и пагинации
 const firstRow = computed(() => (currentPage.value - 1) * rowsPerPage)
 
 const onPageChange = (event) => {
@@ -151,9 +153,19 @@ const applyFilters = () => {
 };
 
 // Выбор выставки
-const onSelectExhibition = (exhibition) => {
-    selectedExhibition.value = exhibition
+const viewExhibition = async () => {
+    if (!selectedRow.value) return;
+
+    try {
+        const response = await api.get(`/exhibitions/${selectedRow.value.id}/books`);
+        const books = response.data;
+        selectedBook.value = books[0]; // Выберите первую книгу для примера
+        isBookModalVisible.value = true;
+    } catch (error) {
+        console.error('Ошибка при загрузке книг выставки:', error);
+    }
 };
+
 
 const fetchExhibitions = async (
     pagination = { page: currentPage.value - 1, size: rowsPerPage },
