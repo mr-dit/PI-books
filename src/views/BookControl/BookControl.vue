@@ -9,7 +9,7 @@
             class="mb-4 p-2 border rounded-lg w-full h-[300px] resize-none"
             readonly
           ></textarea>
-          <Button label="Редактировать" @click="onEditUser" />
+          <Button label="Редактировать" :disabled="!selectedClient" @click="onEditUser" />
         </div>
       </template>
     </FilterMenu>
@@ -110,7 +110,7 @@
               {{ slotProps.data.returnDate }}
             </span></Column
           >
-          <template #footer>
+          <template v-if="totalPages > 1" #footer>
             <div class="flex items-center gap-2 mb-4">
               Страница
               <Button icon="pi pi-chevron-left" @click="previousPage" :disabled="currentPage <= 1"
@@ -161,6 +161,9 @@ import { inputs } from './data'
 import FilterMenu from '@/components/FilterMenu'
 import api from '@/api'
 import { debounce } from 'vue-debounce'
+import { useToast } from 'primevue/usetoast'
+
+const toast = useToast()
 
 const histories = ref([])
 const bookTitle = ref('')
@@ -283,7 +286,7 @@ const validateBook = debounce(async (e) => {
     bookTitle.value = ''
     console.log(e)
   }
-}, 400)
+}, 300)
 
 const onUserSave = async (data) => {
   updateClientInfo(data)
@@ -295,6 +298,16 @@ const onEditUser = () => {
 }
 
 const issueBook = async () => {
+  if (currentIssues.value.length === 5) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Вы не можете выдать больше 5 книг',
+      life: 4000
+    })
+    return
+  }
+
   try {
     const res = await api.post(`history/make-issue/${selectedClient.value.id}/${bookId.value}`)
     await updateHistories()

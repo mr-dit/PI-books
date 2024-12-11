@@ -23,7 +23,7 @@
       >
         <Column field="title" header="Название"></Column>
         <Column field="authorsString" header="Авторы"></Column>
-        <template #footer>
+        <template v-if="totalPages > 1" #footer>
           <div class="flex items-center gap-2 mb-4">
             Страница
             <Button icon="pi pi-chevron-left" @click="previousPage" :disabled="currentPage <= 1"
