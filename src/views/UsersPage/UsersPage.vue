@@ -33,7 +33,7 @@
         <Column field="address" header="Адрес"></Column>
         <Column field="zip" header="Индекс"></Column>
         <Column field="city" header="Город"></Column>
-        <template #footer>
+        <template v-if="totalPages > 1" #footer>
           <div class="flex items-center gap-2 mb-4">
             Страница
             <Button icon="pi pi-chevron-left" @click="previousPage" :disabled="currentPage <= 1"

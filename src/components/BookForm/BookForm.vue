@@ -41,7 +41,7 @@
 
     <div class="flex flex-col items-center">
       <img :src="currentImage" alt="Book cover" class="w-40 h-52 object-cover rounded-md mb-4" />
-      <div class="flex gap-2">
+      <div v-if="images.length > 1" class="flex gap-2">
         <button
           @click="previousImage"
           class="bg-white/10 hover:bg-white/20 text-primary-50 px-3 py-1 rounded"
