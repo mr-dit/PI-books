@@ -1,7 +1,7 @@
 <template>
   <div class="h-screen w-screen flex overflow-hidden">
     <!-- Панель поиска -->
-    <FilterMenu :inputs="inputs" @search="onSearch">
+    <FilterMenu :inputs="inputs" @search="onSearch" title="Управление клиентами">
       <template #footer>
         <div class="flex justify-between gap-2">
           <Button label="Редактировать" @click="onEditUser" />

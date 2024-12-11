@@ -91,66 +91,65 @@ const currentPage = ref(1)
 const totalPages = computed(() => Math.ceil(data.value.length / rowsPerPage))
 
 const onSearch = async (data) => {
-    console.log(data)
-    await fetchExhibitions(undefined, data)
+  console.log(data)
+  await fetchExhibitions(undefined, data)
 }
 
 // Логика для страницы и пагинации
 const firstRow = computed(() => (currentPage.value - 1) * rowsPerPage)
 
 const onPageChange = (event) => {
-    currentPage.value = event.page + 1
+  currentPage.value = event.page + 1
 }
 
-    const previousPage = async () => {
-    if (currentPage.value > 1) {
-        currentPage.value--
-        await fetchExhibitions()
-    }
+const previousPage = async () => {
+  if (currentPage.value > 1) {
+    currentPage.value--
+    await fetchExhibitions()
+  }
 }
 
-    const nextPage = async () => {
-    if (currentPage.value < totalPages.value) {
-        currentPage.value++
-        await fetchExhibitions()
-    }
+const nextPage = async () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++
+    await fetchExhibitions()
+  }
 }
 
-    const validatePagination = (e) => {
-    console.log(e)
+const validatePagination = (e) => {
+  console.log(e)
 
-    const val = e.target.value
+  const val = e.target.value
 
-    if (val > 0 && val <= totalPages.value) {
-        currentPage.value = val
-    }
+  if (val > 0 && val <= totalPages.value) {
+    currentPage.value = val
+  }
 }
 
-    const goToPage = async (e) => {
-    console.log(e.target.value)
-    const val = e.target.value
+const goToPage = async (e) => {
+  console.log(e.target.value)
+  const val = e.target.value
 
-    if (val > 0 && val <= totalPages.value) {
-        currentPage.value = val
-        await fetchExhibitions()
-    }
+  if (val > 0 && val <= totalPages.value) {
+    currentPage.value = val
+    await fetchExhibitions()
+  }
 }
 
 // Логика фильтрации
 const applyFilters = () => {
-    filteredExhibitions.value = exhibitions.value.filter((exhibition) => {
+  filteredExhibitions.value = exhibitions.value.filter((exhibition) => {
     const nameMatch =
-        !filters.value.name ||
-        exhibition.name.toLowerCase().includes(filters.value.name.toLowerCase());
+      !filters.value.name ||
+      exhibition.name.toLowerCase().includes(filters.value.name.toLowerCase())
     const startDateMatch =
-        !filters.value.startDate ||
-        new Date(exhibition.startDate) >= new Date(filters.value.startDate);
+      !filters.value.startDate ||
+      new Date(exhibition.startDate) >= new Date(filters.value.startDate)
     const endDateMatch =
-        !filters.value.endDate ||
-        new Date(exhibition.endDate) <= new Date(filters.value.endDate);
-    return nameMatch && startDateMatch && endDateMatch;
-    });
-};
+      !filters.value.endDate || new Date(exhibition.endDate) <= new Date(filters.value.endDate)
+    return nameMatch && startDateMatch && endDateMatch
+  })
+}
 
 // Выбор выставки
 const viewExhibition = async () => {
@@ -168,24 +167,24 @@ const viewExhibition = async () => {
 
 
 const fetchExhibitions = async (
-    pagination = { page: currentPage.value - 1, size: rowsPerPage },
-    params = {}
+  pagination = { page: currentPage.value - 1, size: rowsPerPage },
+  params = {}
 ) => {
-    let url = 'exhibitions' + `?${new URLSearchParams(pagination).toString()}`
+  let url = 'exhibitions' + `?${new URLSearchParams(pagination).toString()}`
 
-    if (Object.keys(params).length > 0) {
+  if (Object.keys(params).length > 0) {
     url += `&${new URLSearchParams(params).toString()}`
-}
+  }
 
-    try {
+  try {
     const res = await api.get(url)
     const content = res.data.content.map((item) => ({
-    ...item
+      ...item
     }))
     data.value = content
-} catch (e) {
+  } catch (e) {
     console.log(e)
-}
+  }
 }
 
 fetchExhibitions()
@@ -193,9 +192,9 @@ fetchExhibitions()
 
 <style scoped>
 :deep(.p-datatable-paginator-bottom) {
-    display: none;
+  display: none;
 }
 :deep(.p-datatable-table) {
-    min-width: auto !important;
+  min-width: auto !important;
 }
 </style>

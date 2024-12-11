@@ -1,7 +1,7 @@
 <template>
   <div class="h-screen w-screen flex overflow-auto">
     <!-- Панель поиска -->
-    <FilterMenu :inputs="inputs" @search="onSearch">
+    <FilterMenu :inputs="inputs" @search="onSearch" title="Управление выдачами и возвратами">
       <template #footer>
         <div class="flex justify-end flex-col">
           <textarea
