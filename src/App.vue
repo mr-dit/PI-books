@@ -1,9 +1,10 @@
 <script setup>
 import { ref } from 'vue'
-import { RouterLink, RouterView, useRouter } from 'vue-router'
+import { RouterView, useRouter } from 'vue-router'
 import Menubar from 'primevue/menubar'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/api'
+import GlobalLoader from '@/components/GlobalLoader/GlobalLoader.vue'
 
 import './assets/tailwind.css'
 import LoginForm from '@/views/LoginForm'
@@ -16,10 +17,10 @@ const items = ref([
     label: 'Файл',
     icon: 'pi pi-search',
     items: [
-      {
-        label: 'Вход',
-        icon: 'pi pi-bolt'
-      },
+      // {
+      //   label: 'Вход',
+      //   icon: 'pi pi-bolt'
+      // },
       {
         label: 'Выход',
         icon: 'pi pi-server',
@@ -32,14 +33,14 @@ const items = ref([
             authStore.setAuthenticated(false)
           }
         }
-      },
-      {
-        label: 'Закрыть',
-        command: () => {
-          // TODO добавить метод выхода с бэка
-          window.close()
-        }
       }
+      // {
+      //   label: 'Закрыть',
+      //   command: () => {
+      //     // TODO добавить метод выхода с бэка
+      //     window.close()
+      //   }
+      // }
     ]
   },
   {
@@ -84,14 +85,19 @@ const items = ref([
 // }
 // restoreAuthState()
 
+const isLoading = ref(false)
+
 const checkAuth = async () => {
+  isLoading.value = true
   try {
     const response = await api.get('/auth/check-you-is-live')
     authStore.setAuthenticated(response.data)
   } catch (error) {
     authStore.setAuthenticated(false)
     console.warn('Сессия недействительна:', error.response?.data || error.message)
+    isLoading.value = false
   }
+  isLoading.value = false
 }
 
 // Проверяем авторизацию при загрузке страницы
@@ -99,8 +105,9 @@ checkAuth()
 </script>
 
 <template>
+  <GlobalLoader />
   <Toast />
-  <LoginForm v-if="!authStore.isAuthenticated"></LoginForm>
+  <LoginForm v-if="!authStore.isAuthenticated && !isLoading"></LoginForm>
   <div v-else class="h-screen w-screen flex overflow-hidden flex-col">
     <Menubar :model="items"></Menubar>
     <RouterView />
