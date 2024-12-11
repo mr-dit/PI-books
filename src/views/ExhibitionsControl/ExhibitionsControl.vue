@@ -187,13 +187,16 @@ selectedRow.value = event.data
 }
 
 // Открытие модального окна
+
+const isDialogVisible = ref(false)
+
 const viewExhibition = async () => {
 if (!selectedRow.value) return
 
 try {
     const response = await api.get(`/exhibitions/${selectedRow.value.id}/books`)
     selectedRow.value.books = response.data // Добавляем книги в выбранную выставку
-    isBookModalVisible.value = true // Открытие модального окна
+    isDialogVisible.value = true // Открытие модального окна
 } catch (error) {
     console.error('Ошибка при загрузке книг выставки:', error)
 }
