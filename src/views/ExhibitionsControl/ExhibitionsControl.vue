@@ -86,6 +86,24 @@
         />
     </template>
     </Dialog>
+    <Dialog
+    v-model:visible="isEditDialogVisible"
+    modal
+    header="Редактирование выставки"
+    :style="{ width: '30rem' }"
+    >
+    <ExhibitionEdit 
+    :exhibition="selectedRow" 
+    v-model:selectedRow="selectedRow" 
+    />
+    <template #footer>
+        <Button
+        label="Закрыть"
+        @click="isEditDialogVisible = false"
+        class="mt-4 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded"
+        />
+    </template>
+    </Dialog>
 </div>
 </template>
 
@@ -95,6 +113,8 @@ import { inputs } from './data'
 import FilterMenu from '@/components/FilterMenu'
 import api from '@/api'
 import ExhibitionInfo from '@/components/ExhibitionInfo/ExhibitionInfo.vue'
+import ExhibitionEdit from '@/components/ExhibitionEdit/ExhibitionEdit.vue'
+
 
 const props = defineProps({
 book: {
@@ -110,9 +130,9 @@ book: {
 }
 })
 
+const dialogHeader = ref('')
 const data = ref([]) // Полный список выставок
 const selectedRow = ref(null) // Выбранная выставка
-const isBookModalVisible = ref(false) // Состояние видимости модального окна для просмотра выставки
 const rowsPerPage = 10
 const currentPage = ref(1)
 
@@ -187,8 +207,9 @@ selectedRow.value = event.data
 }
 
 // Открытие модального окна
-
 const isDialogVisible = ref(false)
+const isEditDialogVisible = ref(false)
+
 
 const viewExhibition = async () => {
 if (!selectedRow.value) return
@@ -200,6 +221,22 @@ try {
 } catch (error) {
     console.error('Ошибка при загрузке книг выставки:', error)
 }
+}
+
+
+const editExhibition = () => {
+if (!Object.keys(selectedRow.value).length) {
+    toast.add({
+    severity: 'error',
+    summary: 'Ошибка',
+    detail: 'Выставка не выбрана',
+    life: 4000
+    })
+    return
+}
+
+isEditDialogVisible.value = true
+dialogHeader.value = 'Редактирование выставки'
 }
 </script>
 
