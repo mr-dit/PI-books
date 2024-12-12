@@ -1,13 +1,7 @@
 <template>
   <div class="h-screen w-screen flex overflow-auto">
     <!-- Панель поиска -->
-    <FilterMenu :inputs="inputs" @search="onSearch">
-      <template #footer>
-        <div class="flex justify-end flex-col">
-          <Button label="Редактировать" @click="onEditUser" />
-        </div>
-      </template>
-    </FilterMenu>
+    <FilterMenu :inputs="inputs" @search="onSearch"></FilterMenu>
     <div class="w-3/4 h-full p-4 flex flex-col">
       <div class="rounded-lg p-4 shadow-md">
         <h3 class="font-bold text-lg mb-4">Список выставок</h3>
@@ -31,7 +25,7 @@
             <div class="flex items-center gap-2 mb-4">
               Страница
               <Button icon="pi pi-chevron-left" @click="previousPage" :disabled="currentPage <= 1"
-                ><</Button
+                >></Button
               >
               <span>
                 <InputText
@@ -69,6 +63,7 @@
     <!-- Модальное окно для просмотра выставки -->
     <Dialog v-model:visible="isDialogVisible" modal header="Информация о выставке">
       <!-- <ExhibitionInfo :exhibition="selectedRow" v-model:selectedRow="selectedRow" /> -->
+      <AddBookInExh></AddBookInExh>
       <template #footer>
         <Button
           label="Закрыть"
@@ -77,12 +72,7 @@
         />
       </template>
     </Dialog>
-    <Dialog
-      v-model:visible="isEditDialogVisible"
-      modal
-      header="Редактирование выставки"
-      :style="{ width: '30rem' }"
-    >
+    <Dialog v-model:visible="isEditDialogVisible" modal header="Редактирование выставки">
       <ExhibitionEdit :exhibition="selectedRow" v-model:selectedRow="selectedRow" />
       <template #footer>
         <Button
@@ -96,9 +86,8 @@
           class="mt-4 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded"
         />
       </template>
-      <Dialog v-model:visible="isEditDialogVisible" modal header="Редактирование выставки">
-        <AddBookInExh></AddBookInExh>
-      </Dialog>
+      <!-- <Dialog v-model:visible="isEditDialogVisible" modal header="Редактирование выставки">
+      </Dialog> -->
     </Dialog>
   </div>
 </template>
@@ -127,7 +116,6 @@ const props = defineProps({
 })
 
 
-const
 const dialogHeader = ref('')
 const data = ref([]) // Полный список выставок
 const selectedRow = ref(null) // Выбранная выставка

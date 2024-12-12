@@ -1,11 +1,9 @@
 <template>
   <div class="p-4 flex">
     <FilterMenu :inputs="inputs" @search="onSearch" />
-
-    <!-- Результаты поиска и подробная информация -->
+    <!-- Результаты поиска -->
     <div class="w-3/4 h-full p-4 flex flex-col">
       <h2 class="font-bold text-lg mb-4">Результаты поиска</h2>
-
       <!-- Таблица с результатами -->
       <DataTable
         :value="data"

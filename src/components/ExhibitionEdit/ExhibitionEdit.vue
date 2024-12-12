@@ -1,22 +1,22 @@
 <template>
-<div class="flex items-end rounded-lg w-full mx-auto mt-4">
+<div class="p-4 flex">
     <Form
     v-slot="$form"
     :initialValues="initialValues"
     @submit="(e) => onFormSubmit(e, $form)"
     class="flex flex-col gap-4 w-full"
     >
-    <div class="flex flex-col gap-1">
+    <div class="w-3/4 h-full gap-4 p-4 flex flex-col">
         <label>
         Название выставки
-        <InputText id="name" name="name" placeholder="Имя" required :feedback="false" fluid />
+        <InputText id="name" name="name" placeholder="Название выставки" required :feedback="false" fluid />
         </label>
         <label>
             Описание выставки
         <InputText
-            id="address"
-            name="address"
-            placeholder="Адрес"
+            id="description"
+            name="description"
+            placeholder="Описание выставки"
             required
             :feedback="false"
             fluid
@@ -25,21 +25,24 @@
         <label>
             Дата начала
             <div class="flex gap-1">
-            <InputText id="zip" name="zip" placeholder="Дата начала" required :feedback="false" fluid />
+                <InputText id="startDate" name="startDate" placeholder="Дата начала" required :feedback="false" fluid />
             </div>
-            <div class="flex gap-1">
-            <label>
+        </label>
+        <label>
             Дата окончания
-        <InputText v-model="form.endDate" placeholder="Дата окончания" />
+            <div class="flex gap-1">
+                <InputText id="startDate" name="startDate" placeholder="Дата начала" required :feedback="false" fluid />
+            </div>
         </label>
-        </div>
-        </label>
+        <Button type="submit" @click='onSave' label="Сохранить" />
     </div>
-    <Button type="submit" severity="secondary" label="Сохранить" />
+
     </Form>
-    <h3 class="font-bold mt-4">Книги на выставке</h3>
+    <div class="w-3/4 h-full p-4 flex flex-col">
+    <h2 class="font-bold text-lg mb-4">Книги на выставке</h2>
     <DataTable
         :value="books"
+        tableStyle="min-width: 50rem"
         :rows="10"
         :first="firstRow"
         @page="onPageChange"
@@ -49,15 +52,34 @@
         <Column field="title" header="Название книги" />
         <Column field="author" header="Автор" />
         <Column
-        header="Удалить"
+        header=""
         :body="deleteButton"
         />
+        <template #footer>
+        <div class="flex items-center gap-2 mb-4">
+            Страница
+            <Button icon="pi pi-chevron-left" @click="previousPage" :disabled="currentPage <= 1"
+            >></Button
+            >
+            <span>
+            <InputText
+                type="number"
+                :disabled="totalPages <= 1"
+                :value="currentPage"
+                @input="validatePagination"
+                @keydown.enter="goToPage"
+                class="w-20"
+            /></span>
+            <Button
+            icon="pi pi-chevron-right"
+            @click="nextPage"
+            :disabled="currentPage >= totalPages"
+            >></Button
+            >
+            из {{ totalPages }}
+        </div>
+        </template>
     </DataTable>
-
-    <!-- Кнопки управления -->
-    <div class="flex justify-between gap-4">
-        <Button label="Сохранить" @click="onSave" />
-        <Button label="Закрыть" @click="closeDialog" />
     </div>
 </div>
 </template>
@@ -67,13 +89,14 @@
 import { ref, computed } from 'vue'
 import api from '@/api'
 
+
 const props = defineProps({
 exhibition: Object, // Принимаем выставку как prop
 })
 
 const emit = defineEmits(['save', 'cancel'])
 
-const form = ref({
+const data = ref({
 name: props.exhibition.name || '',
 description: props.exhibition.description || '',
 startDate: props.exhibition.startDate || '',
@@ -84,6 +107,41 @@ const books = ref([]) // Список книг
 const selectedBook = ref(null) // Выбранная книга для удаления
 const rowsPerPage = 10
 const currentPage = ref(1)
+const totalPages = ref(Math.ceil(data.value.length / rowsPerPage))
+
+const validatePagination = (e) => {
+    console.log(e)
+
+    const val = e.target.value
+
+    if (val > 0 && val <= totalPages.value) {
+        currentPage.value = val
+    }
+}
+
+const goToPage = async (e) => {
+    console.log(e.target.value)
+    const val = e.target.value
+
+    if (val > 0 && val <= totalPages.value) {
+        currentPage.value = val
+        await fetchBooks()
+    }
+}
+
+const previousPage = async () => {
+    if (currentPage.value > 1) {
+        currentPage.value--
+        await fetchBooks()
+    }
+}
+
+const nextPage = async () => {
+    if (currentPage.value < totalPages.value) {
+        currentPage.value++
+        await fetchBooks()
+    }
+}
 
 const firstRow = computed(() => (currentPage.value - 1) * rowsPerPage)
 
@@ -155,6 +213,9 @@ fetchBooks()
 
 <style scoped>
 :deep(.p-datatable-paginator-bottom) {
-display: none;
+    display: none;
+}
+:deep(.p-datatable-table) {
+    min-width: auto !important;
 }
 </style>
