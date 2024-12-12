@@ -23,9 +23,6 @@
 
 <script setup>
 import { ref } from 'vue'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import Button from 'primevue/button'
 
 // Пропсы для передачи данных
 defineProps({
@@ -42,15 +39,6 @@ defineProps({
 
 // Событие закрытия
 defineEmits(['close'])
-
-// Заголовок окна
-const header = ref('Просмотр выставки')
-
-// Метод закрытия модального окна
-const close = () => {
-  header.value = 'Просмотр выставки'
-  emit('close')
-}
 </script>
 
 <style scoped>

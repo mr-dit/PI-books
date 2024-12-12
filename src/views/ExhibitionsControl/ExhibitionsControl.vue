@@ -68,7 +68,6 @@
     </div>
     <!-- Модальное окно для просмотра выставки -->
     <Dialog v-model:visible="isDialogVisible" modal header="Информация о выставке">
-      <add-book-in-exh></add-book-in-exh>
       <!-- <ExhibitionInfo :exhibition="selectedRow" v-model:selectedRow="selectedRow" /> -->
       <template #footer>
         <Button
@@ -87,11 +86,19 @@
       <ExhibitionEdit :exhibition="selectedRow" v-model:selectedRow="selectedRow" />
       <template #footer>
         <Button
+          label="Добавить книги"
+          @click="isEditDialogVisible = false"
+          class="mt-4 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded"
+        />
+        <Button
           label="Закрыть"
           @click="isEditDialogVisible = false"
           class="mt-4 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded"
         />
       </template>
+      <Dialog v-model:visible="isEditDialogVisible" modal header="Редактирование выставки">
+        <AddBookInExh></AddBookInExh>
+      </Dialog>
     </Dialog>
   </div>
 </template>
@@ -119,6 +126,8 @@ const props = defineProps({
   }
 })
 
+
+const
 const dialogHeader = ref('')
 const data = ref([]) // Полный список выставок
 const selectedRow = ref(null) // Выбранная выставка
