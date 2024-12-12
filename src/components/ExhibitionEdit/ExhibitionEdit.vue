@@ -34,6 +34,7 @@
           <div class="flex gap-1">
             <InputText
               id="startDate"
+              type='date'
               name="startDate"
               placeholder="Дата начала"
               required
@@ -47,6 +48,7 @@
           <div class="flex gap-1">
             <InputText
               id="endDate"
+              type='date'
               name="endDate"
               placeholder="Дата окончания"
               required

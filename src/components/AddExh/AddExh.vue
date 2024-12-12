@@ -7,7 +7,7 @@
       class="flex flex-col gap-4 w-full"
     >
       {{ console.log(form) }}
-      <div class="flex flex-col gap-1">
+      <div class="w-3/4 w-full gap-4 p-4 flex flex-col">
         <label>
           Название выставки
           <InputText id="name" name="name" placeholder="Имя" required :feedback="false" fluid />
@@ -28,6 +28,7 @@
           <div class="flex gap-1">
             <InputText
               id="startDate"
+              type='date'
               name="startDate"
               placeholder="Дата начала"
               required
@@ -35,15 +36,15 @@
               fluid
             />
           </div>
-          <label>
+        </label>
+        <label>
             Дата окончания
             <div class="flex gap-1">
-              <InputText id="endDate" name="endDate" required placeholder="Дата окончания" />
+              <InputText type='date' id="endDate" name="endDate" required placeholder="Дата окончания" />
             </div>
           </label>
-        </label>
       </div>
-      <Button type="submit" severity="secondary" label="Сохранить" />
+      <Button type="submit" label="Сохранить" />
     </Form>
   </div>
 </template>
