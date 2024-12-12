@@ -6,7 +6,12 @@
         <label :for="input.key" class="block text-secondary font-semibold mb-2">
           {{ input.label }}
         </label>
-        <InputText :id="input.key" v-model="formData[input.key]" class="w-full" />
+        <InputText
+          :type="input.type ?? 'text'"
+          :id="input.key"
+          v-model="formData[input.key]"
+          class="w-full"
+        />
       </div>
       <Button label="Поиск" icon="pi pi-search" @click="emitSearch" class="w-full p-button" />
     </div>
