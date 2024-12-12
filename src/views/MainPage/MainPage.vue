@@ -70,7 +70,7 @@ const currentPage = ref(1)
 // Моковые данные книг
 const data = ref([])
 
-const totalPages = computed(() => Math.ceil(data.value.length / rowsPerPage))
+const totalPages = ref(Math.ceil(data.value.length / rowsPerPage))
 const hasBookForm = computed(() => Object.keys(bookForm.value).length > 0)
 
 const onSearch = async (data) => {
@@ -152,6 +152,8 @@ const fetchBooks = async (
       authorsString: item.authors.map((author) => author.name).join(', ')
     }))
     data.value = content
+    const page = res.data.page
+    totalPages.value = page.totalPages
   } catch (e) {
     console.log(e)
   }
