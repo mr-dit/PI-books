@@ -1,7 +1,13 @@
 <template>
   <div class="h-screen w-screen flex overflow-auto">
     <!-- Панель поиска -->
-    <FilterMenu :inputs="inputs" @search="onSearch"></FilterMenu>
+    <FilterMenu :inputs="inputs" @search="onSearch">
+      <template #footer>
+        <div class="flex justify-end flex-col">
+          <Button label="Добавить выставку" @click="onAddExhibition" />
+        </div>
+      </template>
+    </FilterMenu>
     <div class="w-3/4 h-full p-4 flex flex-col">
       <div class="rounded-lg p-4 shadow-md">
         <h3 class="font-bold text-lg mb-4">Список выставок</h3>
@@ -62,8 +68,7 @@
     </div>
     <!-- Модальное окно для просмотра выставки -->
     <Dialog v-model:visible="isDialogVisible" modal header="Информация о выставке">
-      <!-- <ExhibitionInfo :exhibition="selectedRow" v-model:selectedRow="selectedRow" /> -->
-      <AddBookInExh></AddBookInExh>
+      <ExhibitionInfo :exhibition="selectedRow" v-model:selectedRow="selectedRow" />
       <template #footer>
         <Button
           label="Закрыть"
@@ -72,12 +77,29 @@
         />
       </template>
     </Dialog>
-    <Dialog v-model:visible="isEditDialogVisible" modal header="Редактирование выставки">
-      <ExhibitionEdit :exhibition="selectedRow" v-model:selectedRow="selectedRow" />
+    <Dialog v-model:visible="isAddExhVisible" modal header="Добавление выставки">
+      <AddExh :exhibition="{}" @save="onSaveExh" />
       <template #footer>
         <Button
-          label="Добавить книги"
-          @click="isEditDialogVisible = false"
+          label="Закрыть"
+          @click="isAddExhVisible = false"
+          class="mt-4 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded"
+        />
+      </template>
+    </Dialog>
+    <Dialog v-model:visible="isEditDialogVisible" modal header="Редактирование выставки">
+      <ExhibitionEdit
+        :exhibition="selectedRow"
+        :newBook="newBook"
+        v-model:selectedRow="selectedRow"
+        @save="editSave"
+      />
+      <template #footer>
+        <!-- <Button label="Сохранить" @click="onUpdate" /> -->
+
+        <Button
+          label="Редактировать книги"
+          @click="isAddBookInExhVisible = true"
           class="mt-4 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded"
         />
         <Button
@@ -86,8 +108,16 @@
           class="mt-4 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded"
         />
       </template>
-      <!-- <Dialog v-model:visible="isEditDialogVisible" modal header="Редактирование выставки">
-      </Dialog> -->
+      <Dialog v-model:visible="isAddBookInExhVisible" modal header="Добавление книги">
+        <AddBookInExh :exhibition="selectedRow" :used-rows="newBook" @save="addBook"></AddBookInExh>
+        <template #footer>
+          <Button
+            label="Закрыть"
+            @click="isAddBookInExhVisible = false"
+            class="mt-4 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded"
+          />
+        </template>
+      </Dialog>
     </Dialog>
   </div>
 </template>
@@ -100,6 +130,10 @@ import api from '@/api'
 import ExhibitionInfo from '@/components/ExhibitionInfo'
 import AddBookInExh from '@/components/AddBookInExh'
 import ExhibitionEdit from '@/components/ExhibitionEdit/ExhibitionEdit.vue'
+import { useToast } from 'primevue'
+import AddExh from '@/components/AddExh'
+
+const toast = useToast()
 
 const props = defineProps({
   book: {
@@ -115,7 +149,7 @@ const props = defineProps({
   }
 })
 
-
+const isAddBookInExhVisible = ref(false)
 const dialogHeader = ref('')
 const data = ref([]) // Полный список выставок
 const selectedRow = ref(null) // Выбранная выставка
@@ -168,7 +202,7 @@ const goToPage = async (e) => {
 // Получение выставок
 const fetchExhibitions = async (
   pagination = { page: currentPage.value - 1, size: rowsPerPage },
-  params = {}
+  params = { sort: 'id' }
 ) => {
   let url = 'exhibitions' + `?${new URLSearchParams(pagination).toString()}`
 
@@ -195,6 +229,12 @@ const fetchExhibitions = async (
 
 fetchExhibitions()
 
+const newBook = ref([])
+const addBook = async (data) => {
+  newBook.value = data.books
+  isAddBookInExhVisible.value = false
+}
+
 const deleteExhibition = async () => {
   try {
     await api.delete(`exhibitions/${selectedRow.value.id}`)
@@ -207,6 +247,7 @@ const deleteExhibition = async () => {
 // Обработчик выбора выставки
 const onSelectExhibition = (event) => {
   selectedRow.value = event.data
+  newBook.value = selectedRow.value?.books ?? []
 }
 
 // Открытие модального окна
@@ -238,6 +279,21 @@ const editExhibition = () => {
 
   isEditDialogVisible.value = true
   dialogHeader.value = 'Редактирование выставки'
+}
+
+const editSave = async () => {
+  isEditDialogVisible.value = false
+  await fetchExhibitions()
+}
+
+const isAddExhVisible = ref(false)
+const onAddExhibition = () => {
+  isAddExhVisible.value = true
+}
+
+const onSaveExh = async () => {
+  isAddExhVisible.value = false
+  await fetchExhibitions()
 }
 </script>
 

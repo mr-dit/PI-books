@@ -47,7 +47,7 @@
         </template>
       </DataTable>
       <Button
-        label="Добавить книги"
+        label="Обновить книги"
         @click="onAddBooks"
         class="mt-4 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded"
       />
@@ -72,9 +72,11 @@ const props = defineProps({
   },
   usedRows: {
     type: Array,
-    default: () => [{}]
+    default: () => []
   }
 })
+
+const emit = defineEmits(['save', 'cancel'])
 
 const selectedRows = ref(props.usedRows)
 const rowsPerPage = 10
@@ -88,7 +90,6 @@ const totalPages = ref(Math.ceil(data.value.length / rowsPerPage))
 const hasBookForm = computed(() => Object.keys(bookForm.value).length > 0)
 
 const onSearch = async (data) => {
-  console.log(data)
   await fetchBooks(undefined, data)
 }
 
@@ -114,8 +115,6 @@ const nextPage = async () => {
 }
 
 const validatePagination = (e) => {
-  console.log(e)
-
   const val = e.target.value
 
   if (val > 0 && val <= totalPages.value) {
@@ -124,7 +123,6 @@ const validatePagination = (e) => {
 }
 
 const goToPage = async (e) => {
-  console.log(e.target.value)
   const val = e.target.value
 
   if (val > 0 && val <= totalPages.value) {
@@ -136,15 +134,12 @@ const goToPage = async (e) => {
 const bookForm = ref({})
 
 const onSelectBook = async (book) => {
-  console.log('boooooook', book)
-
-  console.log(book.data)
   const data = book.data
 
   selectedRows.value.push(data)
 
-  const res = await api.get(`books/${data.id}`)
-  bookForm.value = res.data
+  // const res = await api.get(`books/${data.id}`)
+  // bookForm.value = res.data
 }
 
 function performSearch() {
@@ -152,21 +147,32 @@ function performSearch() {
 }
 
 const onAddBooks = async () => {
-  if (selectedRows.value.length === 0) {
-    toast.add({
-      severity: 'error',
-      summary: 'Ошибка',
-      detail: 'Выберите книги',
-      life: 3000
-    })
-    return
+  // if (selectedRows.value.length === 0) {
+  //   toast.add({
+  //     severity: 'error',
+  //     summary: 'Ошибка',
+  //     detail: 'Выберите книги',
+  //     life: 3000
+  //   })
+  //   return
+  // }
+
+  const data = {
+    ...props.exhibition,
+    endDate: props.exhibition.endDate + 'T00:00:01',
+    startDate: props.exhibition.startDate + 'T00:00:00'
   }
+
+  const uniqBooks = selectedRows.value.filter((book, index, self) => {
+    return self.findIndex((b) => b.id === book.id) === index
+  })
 
   try {
     const res = await api.put(`exhibitions/${props.exhibition.id}`, {
-      ...props.exhibition,
-      books: selectedRows.value.map((book) => ({ book: { id: book.id } }))
+      ...data,
+      books: uniqBooks.map((book) => ({ book: { id: book.id } }))
     })
+    emit('save', { books: res.data.books })
     console.log(res)
   } catch (e) {
     console.log(e)
