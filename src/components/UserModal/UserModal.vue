@@ -41,25 +41,29 @@
             <InputText id="city" name="city" placeholder="Город" :feedback="false" fluid />
           </div>
         </label>
-        <div class="flex gap-1">
-          <Message
-            v-for="(error, index) of $form.zip?.errors"
-            :key="index"
-            severity="error"
-            size="small"
-            variant="simple"
-            class="flex-1"
-            >{{ error.message }}</Message
-          >
-          <Message
-            v-for="(error, index) of $form.city?.errors"
-            :key="index"
-            severity="error"
-            size="small"
-            variant="simple"
-            class="flex-1"
-            >{{ error.message }}</Message
-          >
+        <div class="flex gap-1 justify-between">
+          <div>
+            <Message
+              v-for="(error, index) of $form.zip?.errors"
+              :key="index"
+              severity="error"
+              size="small"
+              variant="simple"
+              class="flex-1 flex flex-col"
+              >{{ error.message }}</Message
+            >
+          </div>
+          <div>
+            <Message
+              v-for="(error, index) of $form.city?.errors"
+              :key="index"
+              severity="error"
+              size="small"
+              variant="simple"
+              class="flex-1 flex flex-col"
+              >{{ error.message }}</Message
+            >
+          </div>
         </div>
       </div>
       <div class="flex flex-col gap-1">
@@ -146,12 +150,12 @@ const resolver = ref(
         .min(1, { message: 'Обязательное поле' }),
       phone: z
         .string({
-          invalid_type_error: 'Неверный формат телефона'
+          invalid_type_error: 'Неверный формат телефона',
+          required_error: 'Обязательное поле'
         })
+        .min(1, { message: 'Обязательное поле' })
         .regex(/^\+?[\d\s-]+$/, { message: 'Неверный формат телефона' })
-        .max(16, { message: 'Не больше 16 символов' })
-        .optional()
-        .or(z.literal('')),
+        .max(16, { message: 'Не больше 16 символов' }),
       email: z
         .string({
           invalid_type_error: 'Неверный формат email'
@@ -217,7 +221,7 @@ const onFormSubmit = async (c, form) => {
     toast.add({
       severity: 'success',
       summary: 'Успешно',
-      detail: 'Данные пользователя сохранены',
+      detail: 'Данные клиента сохранены',
       life: 3000
     })
   } catch (e) {
@@ -227,7 +231,7 @@ const onFormSubmit = async (c, form) => {
     toast.add({
       severity: 'error',
       summary: 'Ошибка',
-      detail: 'Не удалось сохранить данные пользователя',
+      detail: 'Не удалось сохранить клиента',
       life: 3000
     })
   }
