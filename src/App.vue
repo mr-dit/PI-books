@@ -74,15 +74,15 @@ const items = ref([
         command: async () => {
           await router.push({ name: 'report' })
         }
-      }
-    ]
-  },
-  {
-    label: 'Выставка',
-    icon: '',
-    command: async () => {
+      },
+      {
+        label: 'Выставка',
+        icon: 'pi pi-pencil',
+        command: async () => {
           await router.push({ name: 'exhibitions_control' })
         }
+      }
+    ]
   }
 ])
 
@@ -112,13 +112,15 @@ checkAuth()
 </script>
 
 <template>
-  <GlobalLoader />
   <Toast />
   <LoginForm v-if="!authStore.isAuthenticated && !isLoading"></LoginForm>
   <div v-else class="h-screen w-screen flex overflow-hidden flex-col">
     <Menubar :model="items"></Menubar>
     <RouterView />
   </div>
+  <Teleport to="body">
+    <GlobalLoader />
+  </Teleport>
 </template>
 
 <style scoped>
