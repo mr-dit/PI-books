@@ -19,7 +19,7 @@
         :value="data"
         tableStyle="min-width: 50rem"
         scrollable
-        scrollHeight="95%"
+        scrollHeight="96%"
         :first="firstRow"
         @page="onPageChange"
         selectionMode="single"
@@ -37,16 +37,18 @@
           <div class="flex items-center gap-2 mb-4">
             Страница
             <Button icon="pi pi-chevron-left" @click="previousPage" :disabled="currentPage <= 1"
-              >></Button
+              ><</Button
             >
             <span>
-              <InputText
-                type="number"
-                :disabled="totalPages <= 1"
-                :value="currentPage"
-                @input="validatePagination"
+              <InputNumber
+                v-model="currentPage"
+                mode="decimal"
+                showButtons
+                :min="1"
+                :max="totalPages"
                 @keydown.enter="goToPage"
-                class="w-20"
+                class="!w-20"
+                fluid
             /></span>
             <Button
               icon="pi pi-chevron-right"
@@ -79,10 +81,6 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import InputText from 'primevue/inputtext'
-import Button from 'primevue/button'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
 import { inputs } from './data'
 import FilterMenu from '@/components/FilterMenu'
 import api from '@/api'
@@ -106,7 +104,7 @@ const onSearch = async (data) => {
 
 // Логика для страницы и пагинации
 const selectedRow = ref({})
-const rowsPerPage = 5
+const rowsPerPage = 20
 const currentPage = ref(1)
 
 const totalPages = ref(Math.ceil(data.value.length / rowsPerPage))

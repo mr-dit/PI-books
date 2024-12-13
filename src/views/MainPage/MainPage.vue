@@ -30,13 +30,15 @@
               >></Button
             >
             <span>
-              <InputText
-                type="number"
-                :disabled="totalPages <= 1"
-                :value="currentPage"
-                @input="validatePagination"
+              <InputNumber
+                v-model="currentPage"
+                mode="decimal"
+                showButtons
+                :min="1"
+                :max="totalPages"
                 @keydown.enter="goToPage"
-                class="w-20"
+                class="!w-20"
+                fluid
             /></span>
             <Button
               icon="pi pi-chevron-right"
