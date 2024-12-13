@@ -16,7 +16,7 @@
         dataKey="id"
         @row-select="onSelectBook"
         class="flex-grow mb-4"
-        :style="{ 'min-height': 0, 'min-width': 'auto' }"
+        :style="{ 'min-height': 0, 'min-width': '50rem' }"
       >
         <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
         <Column field="title" header="Название"></Column>
@@ -28,13 +28,15 @@
               >></Button
             >
             <span>
-              <InputText
-                type="number"
-                :disabled="totalPages <= 1"
-                :value="currentPage"
-                @input="validatePagination"
+              <InputNumber
+                v-model="currentPage"
+                mode="decimal"
+                showButtons
+                :min="1"
+                :max="totalPages"
                 @keydown.enter="goToPage"
-                class="w-20"
+                class="!w-20"
+                fluid
             /></span>
             <Button
               icon="pi pi-chevron-right"
@@ -159,8 +161,8 @@ const onAddBooks = async () => {
 
   const data = {
     ...props.exhibition,
-    endDate: props.exhibition.endDate + 'T00:00:01',
-    startDate: props.exhibition.startDate + 'T00:00:00'
+    endDate: props.exhibition.endDate,
+    startDate: props.exhibition.startDate
   }
 
   const uniqBooks = selectedRows.value.filter((book, index, self) => {
@@ -172,8 +174,15 @@ const onAddBooks = async () => {
       ...data,
       books: uniqBooks.map((book) => ({ book: { id: book.id } }))
     })
-    emit('save', { books: res.data.books })
-    console.log(res)
+
+    const books = {
+      books: res.data.books.map((book) => ({
+        ...book,
+        authorsString: book.authors.map((author) => author.name).join(', ')
+      }))
+    }
+
+    emit('save', books)
   } catch (e) {
     console.log(e)
   }
