@@ -6,8 +6,21 @@
         <label :for="input.key" class="block text-secondary font-semibold mb-2">
           {{ input.label }}
         </label>
+        <DatePicker
+          v-if="input.type === 'date'"
+          :id="input.key"
+          :minDate="typeof input.minDate === 'string' ? formData[input.minDate] : input.minDate"
+          :maxDate="typeof input.maxDate === 'string' ? formData[input.maxDate] : input.maxDate"
+          v-model="formData[input.key]"
+          :manualInput="false"
+          showIcon
+          showButtonBar
+          fluid
+          iconDisplay="input"
+        />
         <InputText
-          :type="input.type ?? 'text'"
+          v-else
+          type="text"
           :id="input.key"
           v-model="formData[input.key]"
           class="w-full"
@@ -20,7 +33,7 @@
 </template>
 
 <script setup>
-import { reactive, computed } from 'vue'
+import { reactive } from 'vue'
 
 const props = defineProps({
   title: {
