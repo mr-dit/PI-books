@@ -79,7 +79,7 @@ const props = defineProps({
 const emit = defineEmits(['save', 'cancel'])
 
 const selectedRows = ref(props.usedRows)
-const rowsPerPage = 10
+const rowsPerPage = 5
 const currentPage = ref(1)
 // const currentPage = ref('')
 

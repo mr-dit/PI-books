@@ -21,6 +21,7 @@
         <p class="text font-semibold mb-2">Идентификатор книги</p>
         <div class="flex flex-col gap-2">
           <input
+            :disabled="!selectedClient"
             :value="bookId"
             @input="validateBook"
             class="input-text text-lg"
@@ -141,7 +142,7 @@
   <Dialog
     v-model:visible="isDialogVisible"
     modal
-    header="Редактирование пользователя"
+    header="Редактирование клиента"
     :style="{ width: '30rem' }"
   >
     <UserModal :user="selectedClient" @save="onUserSave" />
@@ -243,6 +244,14 @@ const updateHistories = async (id = selectedClient.value.id) => {
 }
 
 const onSearch = async (searchParams) => {
+  if (!searchParams.id) {
+    clientInfo.value = 'Произошла ошибка при поиске клиента.'
+    currentIssues.value = []
+    totalPages.value = 0
+    histories.value = []
+    selectedClient.value = null
+    return
+  }
   try {
     await updateHistories(searchParams.id)
 
