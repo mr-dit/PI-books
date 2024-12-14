@@ -30,8 +30,11 @@
           <div class="flex flex-row gap-2 mt-4 justify-between">
             <div v-if="totalPages > 1" class="flex items-center gap-2">
               Страница
-              <Button icon="pi pi-chevron-left" @click="previousPage" :disabled="currentPage <= 1"
-                ><</Button
+              <Button
+                icon="pi pi-chevron-left"
+                @click="previousPage"
+                :disabled="currentPage <= 1"
+                >{{ '<' }}</Button
               >
               <span>
                 <InputNumber
@@ -89,7 +92,12 @@
         />
       </template>
     </Dialog>
-    <Dialog v-model:visible="isEditDialogVisible" modal header="Редактирование выставки">
+    <Dialog
+      v-model:visible="isEditDialogVisible"
+      modal
+      header="Редактирование выставки"
+      @hide="selectedRow = null"
+    >
       <ExhibitionEdit
         :exhibition="selectedRow"
         :newBook="newBook"
@@ -245,7 +253,9 @@ const newBook = ref([])
 const addBook = async (data) => {
   newBook.value = data.books
   isAddBookInExhVisible.value = false
+  const row = selectedRow.value
   await fetchExhibitions()
+  selectedRow.value = row
 }
 
 const deleteExhibition = async () => {

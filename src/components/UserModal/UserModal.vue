@@ -206,7 +206,7 @@ const onFormSubmit = async (c, form) => {
       ...c.values
     }
 
-    const id = initialValues.value.id
+    const id = initialValues.value?.id
     if (!id) {
       const res = await api.post('customers', user)
       emit('save', res.data)
