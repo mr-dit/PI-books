@@ -102,8 +102,10 @@ const dialogHeader = ref('Создание клиента')
 // Моковые данные книг
 const data = ref([])
 
+const filters = ref({})
 const onSearch = async (data) => {
-  console.log(data)
+  filters.value = data
+  currentPage.value = 1
   await fetchUsers(undefined, data)
 }
 
@@ -186,7 +188,7 @@ const onUserSave = async () => {
 
 const fetchUsers = async (
   pagination = { page: currentPage.value - 1, size: rowsPerPage, sort: 'id,asc' },
-  params = {}
+  params = filters.value
 ) => {
   let url = 'customers' + `?${new URLSearchParams(pagination).toString()}`
 

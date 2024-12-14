@@ -160,9 +160,11 @@ const currentPage = ref(1)
 
 const totalPages = ref(Math.ceil(data.value.length / rowsPerPage))
 
-const onSearch = async (filters) => {
-  console.log(filters)
-  await fetchExhibitions(undefined, filters)
+const filters = ref({})
+const onSearch = async (data) => {
+  filters.value = data
+  currentPage.value = 1
+  await fetchExhibitions(undefined, data)
 }
 
 // Логика для страницы и пагинации
@@ -204,7 +206,7 @@ const goToPage = async (e) => {
 // Получение выставок
 const fetchExhibitions = async (
   pagination = { page: currentPage.value - 1, size: rowsPerPage },
-  params = { sort: 'id' }
+  params = { sort: 'id', ...filters.value }
 ) => {
   let url = 'exhibitions' + `?${new URLSearchParams(pagination).toString()}`
 
