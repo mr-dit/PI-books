@@ -1,29 +1,26 @@
 <template>
-  <div class="h-screen w-screen flex overflow-hidden">
-    <!-- Панель поиска -->
+  <div class="p-4 flex">
     <FilterMenu :inputs="inputs" @search="onSearch" />
-
-    <!-- Результаты поиска и подробная информация -->
+    <!-- Результаты поиска -->
     <div class="w-3/4 h-full p-4 flex flex-col">
       <h2 class="font-bold text-lg mb-4">Результаты поиска</h2>
-
       <!-- Таблица с результатами -->
       <DataTable
+        class="flex flex-col flex-grow mb-4 justify-between w-full min-h-[500px]"
         :value="data"
-        tableStyle="min-width: 50rem"
         scrollable
-        scrollHeight="85%"
+        table-style="width: 50rem"
+        scrollHeight="450px"
         :first="firstRow"
         @page="onPageChange"
-        selectionMode="single"
-        v-model:selection="selectedRow"
+        v-model:selection="selectedRows"
+        dataKey="id"
         @row-select="onSelectBook"
-        class="flex-grow mb-4"
-        :style="{ 'min-height': 0, 'min-width': 'auto' }"
       >
+        <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
         <Column field="title" header="Название"></Column>
         <Column field="authorsString" header="Авторы"></Column>
-        <template v-if="totalPages > 1" #footer>
+        <template #footer>
           <div class="flex items-center gap-2 mb-4">
             Страница
             <Button icon="pi pi-chevron-left" @click="previousPage" :disabled="currentPage <= 1"
@@ -50,9 +47,12 @@
           </div>
         </template>
       </DataTable>
-
+      <Button
+        label="Обновить книги"
+        @click="onAddBooks"
+        class="mt-4 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded"
+      />
       <!-- Подробная информация о книге -->
-      <BookForm v-if="hasBookForm" :book="bookForm"></BookForm>
     </div>
   </div>
 </template>
@@ -60,15 +60,28 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { inputs } from './data'
-import BookForm from '@/components/BookForm'
 import FilterMenu from '@/components/FilterMenu'
 import api from '@/api'
 import { useToast } from 'primevue/usetoast'
+import { toISODateWithTime } from '@/helpers'
 
 const toast = useToast()
 
-const selectedRow = ref(null)
-const rowsPerPage = 50
+const props = defineProps({
+  exhibition: {
+    type: Object,
+    default: () => {}
+  },
+  usedRows: {
+    type: Array,
+    default: () => []
+  }
+})
+
+const emit = defineEmits(['save', 'cancel'])
+
+const selectedRows = ref(props.usedRows)
+const rowsPerPage = 10
 const currentPage = ref(1)
 // const currentPage = ref('')
 
@@ -79,7 +92,6 @@ const totalPages = ref(Math.ceil(data.value.length / rowsPerPage))
 const hasBookForm = computed(() => Object.keys(bookForm.value).length > 0)
 
 const onSearch = async (data) => {
-  console.log(data)
   await fetchBooks(undefined, data)
 }
 
@@ -105,8 +117,6 @@ const nextPage = async () => {
 }
 
 const validatePagination = (e) => {
-  console.log(e)
-
   const val = e.target.value
 
   if (val > 0 && val <= totalPages.value) {
@@ -115,7 +125,6 @@ const validatePagination = (e) => {
 }
 
 const goToPage = async (e) => {
-  console.log(e.target.value)
   const val = e.target.value
 
   if (val > 0 && val <= totalPages.value) {
@@ -127,17 +136,52 @@ const goToPage = async (e) => {
 const bookForm = ref({})
 
 const onSelectBook = async (book) => {
-  console.log(book.data)
   const data = book.data
 
-  selectedRow.value = data
+  selectedRows.value.push(data)
 
-  const res = await api.get(`books/${data.id}`)
-  bookForm.value = res.data
+  // const res = await api.get(`books/${data.id}`)
+  // bookForm.value = res.data
 }
 
 function performSearch() {
   currentPage.value = 1
+}
+
+const onAddBooks = async () => {
+  const data = {
+    ...props.exhibition,
+    endDate: toISODateWithTime(props.exhibition.endDate),
+    startDate: toISODateWithTime(props.exhibition.startDate)
+  }
+
+  const uniqBooks = selectedRows.value.filter((book, index, self) => {
+    return self.findIndex((b) => b.id === book.id) === index
+  })
+
+  try {
+    const res = await api.put(`exhibitions/${props.exhibition.id}`, {
+      ...data,
+      books: uniqBooks.map((book) => ({ book: { id: book.id } }))
+    })
+
+    const books = {
+      books: res.data.books.map((book) => ({
+        ...book,
+        authorsString: book.authors.map((author) => author.name).join(', ')
+      }))
+    }
+
+    emit('save', books)
+  } catch (e) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
+    console.log(e)
+  }
 }
 
 const fetchBooks = async (

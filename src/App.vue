@@ -8,7 +8,9 @@ import GlobalLoader from '@/components/GlobalLoader/GlobalLoader.vue'
 
 import './assets/tailwind.css'
 import LoginForm from '@/views/LoginForm'
+import { useToast } from 'primevue/usetoast'
 
+const toast = useToast()
 const authStore = useAuthStore()
 const router = useRouter()
 
@@ -29,7 +31,12 @@ const items = ref([
             await api.post('auth/logout')
             authStore.setAuthenticated(false)
           } catch (e) {
-            console.log(e)
+            toast.add({
+              severity: 'error',
+              summary: 'Ошибка',
+              detail: 'Произошла ошибка, попробуйте еще раз',
+              life: 3000
+            })
             authStore.setAuthenticated(false)
           }
         }
@@ -74,6 +81,13 @@ const items = ref([
         command: async () => {
           await router.push({ name: 'report' })
         }
+      },
+      {
+        label: 'Выставка',
+        icon: 'pi pi-pencil',
+        command: async () => {
+          await router.push({ name: 'exhibitions_control' })
+        }
       }
     ]
   }
@@ -105,13 +119,15 @@ checkAuth()
 </script>
 
 <template>
-  <GlobalLoader />
   <Toast />
   <LoginForm v-if="!authStore.isAuthenticated && !isLoading"></LoginForm>
   <div v-else class="h-screen w-screen flex overflow-hidden flex-col">
     <Menubar :model="items"></Menubar>
     <RouterView />
   </div>
+  <Teleport to="body">
+    <GlobalLoader />
+  </Teleport>
 </template>
 
 <style scoped>

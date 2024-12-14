@@ -54,15 +54,18 @@
         <div class="flex items-center gap-2 mb-4">
           Страница
           <Button icon="pi pi-chevron-left" @click="previousPage" :disabled="currentPage <= 1"
-            ><</Button
+            >></Button
           >
           <span>
-            <InputText
-              type="number"
-              :value="currentPage"
-              @input="validatePagination"
+            <InputNumber
+              v-model="currentPage"
+              mode="decimal"
+              showButtons
+              :min="1"
+              :max="totalPages"
               @keydown.enter="goToPage"
-              class="w-20"
+              class="!w-20"
+              fluid
           /></span>
           <Button icon="pi pi-chevron-right" @click="nextPage" :disabled="currentPage >= totalPages"
             >></Button
@@ -79,6 +82,9 @@ import { ref, computed } from 'vue'
 import { saveAs } from 'file-saver'
 import api from '@/api'
 import { debounce } from 'vue-debounce'
+import { useToast } from 'primevue/usetoast'
+
+const toast = useToast()
 
 const bookId = ref('')
 const bookInfo = ref(null)
@@ -137,6 +143,12 @@ const fetchBookHistory = debounce(async () => {
     bookInfo.value = res.data
     await fetchHistories()
   } catch (e) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     bookInfo.value = null
     history.value = []
     console.log(e)
@@ -182,6 +194,12 @@ const fetchHistories = async (
     totalPages.value = page.totalPages
     history.value = res.data.content
   } catch (e) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     console.log(e)
   }
 }

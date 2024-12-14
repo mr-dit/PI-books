@@ -1,7 +1,7 @@
 <template>
   <div class="h-screen w-screen flex overflow-auto">
     <!-- Панель поиска -->
-    <FilterMenu :inputs="inputs" @search="onSearch">
+    <FilterMenu :inputs="inputs" @search="onSearch" title="Управление выдачами и возвратами">
       <template #footer>
         <div class="flex justify-end flex-col">
           <textarea
@@ -21,6 +21,7 @@
         <p class="text font-semibold mb-2">Идентификатор книги</p>
         <div class="flex flex-col gap-2">
           <input
+            :disabled="!selectedClient"
             :value="bookId"
             @input="validateBook"
             class="input-text text-lg"
@@ -30,7 +31,7 @@
             <div>
               <span v-if="bookTitle">Название: {{ bookTitle }}</span>
             </div>
-            <div class="flex flex-col gap-2 mt-4">
+            <div class="flex gap-2 mt-4">
               <Button class="w-[150px]" :disabled="!canIssue" @click="issueBook"> Выдать </Button>
               <Button class="w-[150px]" :disabled="!canReturn" @click="returnBook">
                 Вернуть
@@ -95,7 +96,7 @@
           selectionMode="single"
           :selection="selectedHistory"
           @selection-change="onSelectHistory"
-          class="mb-4"
+          class="mb-3"
         >
           <Column field="bookTitle" header="Название"></Column>
           <Column field="dateOfIssue" header="Дата выдачи"></Column>
@@ -111,19 +112,21 @@
             </span></Column
           >
           <template v-if="totalPages > 1" #footer>
-            <div class="flex items-center gap-2 mb-4">
+            <div class="flex items-center gap-2">
               Страница
               <Button icon="pi pi-chevron-left" @click="previousPage" :disabled="currentPage <= 1"
                 ><</Button
               >
               <span>
-                <InputText
-                  type="number"
-                  :value="currentPage"
-                  :disabled="totalPages <= 1"
-                  @input="validatePagination"
+                <InputNumber
+                  v-model="currentPage"
+                  mode="decimal"
+                  showButtons
+                  :min="1"
+                  :max="totalPages"
                   @keydown.enter="goToPage"
-                  class="w-20"
+                  class="!w-20"
+                  fluid
               /></span>
               <Button
                 icon="pi pi-chevron-right"
@@ -141,7 +144,7 @@
   <Dialog
     v-model:visible="isDialogVisible"
     modal
-    header="Редактирование пользователя"
+    header="Редактирование клиента"
     :style="{ width: '30rem' }"
   >
     <UserModal :user="selectedClient" @save="onUserSave" />
@@ -238,11 +241,25 @@ const updateHistories = async (id = selectedClient.value.id) => {
     const resHistories = await fetchCustomerHistory(id)
     histories.value = resHistories
   } catch (error) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     console.error('Ошибка обновления истории:', error)
   }
 }
 
 const onSearch = async (searchParams) => {
+  if (!searchParams.id) {
+    clientInfo.value = 'Произошла ошибка при поиске клиента.'
+    currentIssues.value = []
+    totalPages.value = 0
+    histories.value = []
+    selectedClient.value = null
+    return
+  }
   try {
     await updateHistories(searchParams.id)
 
@@ -254,6 +271,12 @@ const onSearch = async (searchParams) => {
       clientInfo.value = 'Клиент не найден.'
     }
   } catch (error) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     console.error('Ошибка поиска клиента:', error)
     clientInfo.value = 'Произошла ошибка при поиске клиента.'
   }
@@ -283,6 +306,12 @@ const validateBook = debounce(async (e) => {
     const res = await api.get(`books/${val}`)
     bookTitle.value = res.data.title
   } catch (e) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     bookTitle.value = ''
     console.log(e)
   }
@@ -312,6 +341,12 @@ const issueBook = async () => {
     const res = await api.post(`history/make-issue/${selectedClient.value.id}/${bookId.value}`)
     await updateHistories()
   } catch (e) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     console.log(e)
   }
 }
@@ -325,6 +360,12 @@ const returnBook = async () => {
 
     await updateHistories()
   } catch (e) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     console.log(e)
   }
 }
@@ -348,6 +389,12 @@ const fetchCurrIssues = async (
     // totalPages.value = page.totalPages
     return res.data.content
   } catch (e) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     console.log(e)
   }
 }
@@ -372,6 +419,12 @@ const fetchCustomerHistory = async (
     totalPages.value = page.totalPages
     return res.data.content
   } catch (e) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     console.log(e)
   }
 }

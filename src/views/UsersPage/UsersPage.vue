@@ -1,11 +1,16 @@
 <template>
   <div class="h-screen w-screen flex overflow-hidden">
     <!-- Панель поиска -->
-    <FilterMenu :inputs="inputs" @search="onSearch">
+    <FilterMenu :inputs="inputs" @search="onSearch" title="Управление клиентами">
       <template #footer>
         <div class="flex justify-between gap-2">
-          <Button label="Редактировать" @click="onEditUser" />
-          <Button label="Добавить" @click="onAddUser" />
+          <Button
+            class="w-[150px]"
+            :disabled="!selectedRow"
+            label="Редактировать"
+            @click="onEditUser"
+          />
+          <Button class="w-[150px]" label="Добавить" @click="onAddUser" />
         </div>
       </template>
     </FilterMenu>
@@ -19,7 +24,7 @@
         :value="data"
         tableStyle="min-width: 50rem"
         scrollable
-        scrollHeight="95%"
+        scrollHeight="96%"
         :first="firstRow"
         @page="onPageChange"
         selectionMode="single"
@@ -40,13 +45,15 @@
               ><</Button
             >
             <span>
-              <InputText
-                type="number"
-                :disabled="totalPages <= 1"
-                :value="currentPage"
-                @input="validatePagination"
+              <InputNumber
+                v-model="currentPage"
+                mode="decimal"
+                showButtons
+                :min="1"
+                :max="totalPages"
                 @keydown.enter="goToPage"
-                class="w-20"
+                class="!w-20"
+                fluid
             /></span>
             <Button
               icon="pi pi-chevron-right"
@@ -79,10 +86,6 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import InputText from 'primevue/inputtext'
-import Button from 'primevue/button'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
 import { inputs } from './data'
 import FilterMenu from '@/components/FilterMenu'
 import api from '@/api'
@@ -105,8 +108,8 @@ const onSearch = async (data) => {
 }
 
 // Логика для страницы и пагинации
-const selectedRow = ref({})
-const rowsPerPage = 5
+const selectedRow = ref(null)
+const rowsPerPage = 20
 const currentPage = ref(1)
 
 const totalPages = ref(Math.ceil(data.value.length / rowsPerPage))
@@ -172,7 +175,7 @@ const onEditUser = () => {
   dialogHeader.value = 'Редактирование клиента'
 }
 const onAddUser = () => {
-  selectedRow.value = {}
+  selectedRow.value = null
   isDialogVisible.value = true
   dialogHeader.value = 'Создание клиента'
 }
@@ -198,6 +201,12 @@ const fetchUsers = async (
     totalPages.value = page.totalPages
     data.value = res.data.content
   } catch (e) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     console.log(e)
   }
 }

@@ -37,6 +37,11 @@ const router = createRouter({
       path: '/report',
       name: 'report',
       component: () => import('@/views/BookReport')
+    },
+    {
+      path: '/exhibitions_control',
+      name: 'exhibitions_control',
+      component: () => import('@/views/ExhibitionsControl')
     }
   ]
 })
