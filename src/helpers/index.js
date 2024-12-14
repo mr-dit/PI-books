@@ -6,5 +6,5 @@ export function toISODateWithTime(date) {
   const day = String(date.getDate()).padStart(2, '0')
 
   // Формируем строку ISO с фиктивным временем
-  return `${year}-${month}-${day}T00:00:00`
+  return `${year}-${month}-${day}`
 }

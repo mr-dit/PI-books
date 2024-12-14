@@ -26,9 +26,9 @@
         <template v-if="totalPages > 1" #footer>
           <div class="flex items-center gap-2 mb-4">
             Страница
-            <Button icon="pi pi-chevron-left" @click="previousPage" :disabled="currentPage <= 1"
-              ><</Button
-            >
+            <Button icon="pi pi-chevron-left" @click="previousPage" :disabled="currentPage <= 1">{{
+              '<'
+            }}</Button>
             <span>
               <InputNumber
                 v-model="currentPage"
@@ -78,8 +78,10 @@ const data = ref([])
 const totalPages = ref(Math.ceil(data.value.length / rowsPerPage))
 const hasBookForm = computed(() => Object.keys(bookForm.value).length > 0)
 
+const filters = ref({})
 const onSearch = async (data) => {
-  console.log(data)
+  filters.value = data
+  currentPage.value = 1
   await fetchBooks(undefined, data)
 }
 
@@ -142,7 +144,7 @@ function performSearch() {
 
 const fetchBooks = async (
   pagination = { page: currentPage.value - 1, size: rowsPerPage },
-  params = {}
+  params = filters.value
 ) => {
   let url = 'books' + `?${new URLSearchParams(pagination).toString()}`
 

@@ -120,7 +120,8 @@ checkAuth()
 
 <template>
   <Toast />
-  <LoginForm v-if="!authStore.isAuthenticated && !isLoading"></LoginForm>
+  <div v-if="isLoading"></div>
+  <LoginForm v-else-if="!authStore.isAuthenticated"></LoginForm>
   <div v-else class="h-screen w-screen flex overflow-hidden flex-col">
     <Menubar :model="items"></Menubar>
     <RouterView />

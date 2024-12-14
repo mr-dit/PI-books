@@ -30,8 +30,11 @@
           <div class="flex flex-row gap-2 mt-4 justify-between">
             <div v-if="totalPages > 1" class="flex items-center gap-2">
               Страница
-              <Button icon="pi pi-chevron-left" @click="previousPage" :disabled="currentPage <= 1"
-                ><</Button
+              <Button
+                icon="pi pi-chevron-left"
+                @click="previousPage"
+                :disabled="currentPage <= 1"
+                >{{ '<' }}</Button
               >
               <span>
                 <InputNumber
@@ -89,7 +92,12 @@
         />
       </template>
     </Dialog>
-    <Dialog v-model:visible="isEditDialogVisible" modal header="Редактирование выставки">
+    <Dialog
+      v-model:visible="isEditDialogVisible"
+      modal
+      header="Редактирование выставки"
+      @hide="selectedRow = null"
+    >
       <ExhibitionEdit
         :exhibition="selectedRow"
         :newBook="newBook"
@@ -160,9 +168,11 @@ const currentPage = ref(1)
 
 const totalPages = ref(Math.ceil(data.value.length / rowsPerPage))
 
-const onSearch = async (filters) => {
-  console.log(filters)
-  await fetchExhibitions(undefined, filters)
+const filters = ref({})
+const onSearch = async (data) => {
+  filters.value = data
+  currentPage.value = 1
+  await fetchExhibitions(undefined, data)
 }
 
 // Логика для страницы и пагинации
@@ -204,7 +214,7 @@ const goToPage = async (e) => {
 // Получение выставок
 const fetchExhibitions = async (
   pagination = { page: currentPage.value - 1, size: rowsPerPage },
-  params = { sort: 'id' }
+  params = { sort: 'id', ...filters.value }
 ) => {
   let url = 'exhibitions' + `?${new URLSearchParams(pagination).toString()}`
 
@@ -243,7 +253,9 @@ const newBook = ref([])
 const addBook = async (data) => {
   newBook.value = data.books
   isAddBookInExhVisible.value = false
+  const row = selectedRow.value
   await fetchExhibitions()
+  selectedRow.value = row
 }
 
 const deleteExhibition = async () => {

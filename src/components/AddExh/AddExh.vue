@@ -114,7 +114,7 @@ const form = ref({
 
 // Сохранить изменения в выставке
 const onSave = async (c, form) => {
-  if (!form.valid) {
+  if (!c.valid) {
     return
   }
 

@@ -67,8 +67,8 @@ const updateSelectedAuthor = async (e) => {
   const val = e.target.value
   console.log(e.target.value)
   const res = await api.get(`authors/${val}`)
-
   localSelectedAuthor.value = res.data
+  await new Promise((resolve) => setTimeout(resolve, 200))
 }
 </script>
 
