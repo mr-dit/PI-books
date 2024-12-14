@@ -31,7 +31,7 @@
             <div>
               <span v-if="bookTitle">Название: {{ bookTitle }}</span>
             </div>
-            <div class="flex flex-col gap-2 mt-4">
+            <div class="flex gap-2 mt-4">
               <Button class="w-[150px]" :disabled="!canIssue" @click="issueBook"> Выдать </Button>
               <Button class="w-[150px]" :disabled="!canReturn" @click="returnBook">
                 Вернуть
@@ -96,7 +96,7 @@
           selectionMode="single"
           :selection="selectedHistory"
           @selection-change="onSelectHistory"
-          class="mb-4"
+          class="mb-3"
         >
           <Column field="bookTitle" header="Название"></Column>
           <Column field="dateOfIssue" header="Дата выдачи"></Column>
@@ -112,10 +112,10 @@
             </span></Column
           >
           <template v-if="totalPages > 1" #footer>
-            <div class="flex items-center gap-2 mb-4">
+            <div class="flex items-center gap-2">
               Страница
               <Button icon="pi pi-chevron-left" @click="previousPage" :disabled="currentPage <= 1"
-                >></Button
+                ><</Button
               >
               <span>
                 <InputNumber
@@ -241,6 +241,12 @@ const updateHistories = async (id = selectedClient.value.id) => {
     const resHistories = await fetchCustomerHistory(id)
     histories.value = resHistories
   } catch (error) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     console.error('Ошибка обновления истории:', error)
   }
 }
@@ -265,6 +271,12 @@ const onSearch = async (searchParams) => {
       clientInfo.value = 'Клиент не найден.'
     }
   } catch (error) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     console.error('Ошибка поиска клиента:', error)
     clientInfo.value = 'Произошла ошибка при поиске клиента.'
   }
@@ -294,6 +306,12 @@ const validateBook = debounce(async (e) => {
     const res = await api.get(`books/${val}`)
     bookTitle.value = res.data.title
   } catch (e) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     bookTitle.value = ''
     console.log(e)
   }
@@ -323,6 +341,12 @@ const issueBook = async () => {
     const res = await api.post(`history/make-issue/${selectedClient.value.id}/${bookId.value}`)
     await updateHistories()
   } catch (e) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     console.log(e)
   }
 }
@@ -336,6 +360,12 @@ const returnBook = async () => {
 
     await updateHistories()
   } catch (e) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     console.log(e)
   }
 }
@@ -359,6 +389,12 @@ const fetchCurrIssues = async (
     // totalPages.value = page.totalPages
     return res.data.content
   } catch (e) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     console.log(e)
   }
 }
@@ -383,6 +419,12 @@ const fetchCustomerHistory = async (
     totalPages.value = page.totalPages
     return res.data.content
   } catch (e) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     console.log(e)
   }
 }

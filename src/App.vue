@@ -8,7 +8,9 @@ import GlobalLoader from '@/components/GlobalLoader/GlobalLoader.vue'
 
 import './assets/tailwind.css'
 import LoginForm from '@/views/LoginForm'
+import { useToast } from 'primevue/usetoast'
 
+const toast = useToast()
 const authStore = useAuthStore()
 const router = useRouter()
 
@@ -29,7 +31,12 @@ const items = ref([
             await api.post('auth/logout')
             authStore.setAuthenticated(false)
           } catch (e) {
-            console.log(e)
+            toast.add({
+              severity: 'error',
+              summary: 'Ошибка',
+              detail: 'Произошла ошибка, попробуйте еще раз',
+              life: 3000
+            })
             authStore.setAuthenticated(false)
           }
         }

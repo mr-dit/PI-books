@@ -82,6 +82,9 @@ import { ref, computed } from 'vue'
 import { saveAs } from 'file-saver'
 import api from '@/api'
 import { debounce } from 'vue-debounce'
+import { useToast } from 'primevue/usetoast'
+
+const toast = useToast()
 
 const bookId = ref('')
 const bookInfo = ref(null)
@@ -140,6 +143,12 @@ const fetchBookHistory = debounce(async () => {
     bookInfo.value = res.data
     await fetchHistories()
   } catch (e) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     bookInfo.value = null
     history.value = []
     console.log(e)
@@ -185,6 +194,12 @@ const fetchHistories = async (
     totalPages.value = page.totalPages
     history.value = res.data.content
   } catch (e) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     console.log(e)
   }
 }

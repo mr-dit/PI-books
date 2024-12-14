@@ -57,11 +57,28 @@ const formData = reactive(
   }, {})
 )
 
+const isDate = (obj) => Object.prototype.toString.call(obj) === '[object Date]'
+
+function toISODate(date) {
+  date = new Date(date)
+  // Получаем компоненты года, месяца и дня
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0') // Месяцы начинаются с 0
+  const day = String(date.getDate()).padStart(2, '0')
+
+  // Формируем строку ISO с фиктивным временем
+  return `${year}-${month}-${day}`
+}
+
 const emitSearch = () => {
   const formDataCopy = { ...formData }
   for (const key in formDataCopy) {
-    if (!formDataCopy[key]) {
+    const val = formDataCopy[key]
+    if (!val) {
       delete formDataCopy[key]
+    }
+    if (isDate(val)) {
+      formDataCopy[key] = toISODate(val)
     }
   }
   emit('search', formDataCopy)

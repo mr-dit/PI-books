@@ -70,6 +70,9 @@ import { ref, computed } from 'vue'
 import { saveAs } from 'file-saver'
 import api from '@/api'
 import HistoryBook from './HistoryBook.vue'
+import { useToast } from 'primevue/usetoast'
+
+const toast = useToast()
 
 const sortField = ref('dateOfIssue')
 const sortOrder = ref(-1)
@@ -156,6 +159,12 @@ const fetchReminders = async (
     totalPages.value = page.totalPages
     reminders.value = res.data.content
   } catch (e) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     console.log(e)
   }
 }

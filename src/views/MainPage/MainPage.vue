@@ -27,7 +27,7 @@
           <div class="flex items-center gap-2 mb-4">
             Страница
             <Button icon="pi pi-chevron-left" @click="previousPage" :disabled="currentPage <= 1"
-              >></Button
+              ><</Button
             >
             <span>
               <InputNumber
@@ -63,6 +63,9 @@ import { inputs } from './data'
 import BookForm from '@/components/BookForm'
 import FilterMenu from '@/components/FilterMenu'
 import api from '@/api'
+import { useToast } from 'primevue/usetoast'
+
+const toast = useToast()
 
 const selectedRow = ref(null)
 const rowsPerPage = 50
@@ -157,6 +160,12 @@ const fetchBooks = async (
     const page = res.data.page
     totalPages.value = page.totalPages
   } catch (e) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     console.log(e)
   }
 }

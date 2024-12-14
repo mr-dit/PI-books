@@ -4,8 +4,13 @@
     <FilterMenu :inputs="inputs" @search="onSearch" title="Управление клиентами">
       <template #footer>
         <div class="flex justify-between gap-2">
-          <Button label="Редактировать" @click="onEditUser" />
-          <Button label="Добавить" @click="onAddUser" />
+          <Button
+            class="w-[150px]"
+            :disabled="!selectedRow"
+            label="Редактировать"
+            @click="onEditUser"
+          />
+          <Button class="w-[150px]" label="Добавить" @click="onAddUser" />
         </div>
       </template>
     </FilterMenu>
@@ -103,7 +108,7 @@ const onSearch = async (data) => {
 }
 
 // Логика для страницы и пагинации
-const selectedRow = ref({})
+const selectedRow = ref(null)
 const rowsPerPage = 20
 const currentPage = ref(1)
 
@@ -170,7 +175,7 @@ const onEditUser = () => {
   dialogHeader.value = 'Редактирование клиента'
 }
 const onAddUser = () => {
-  selectedRow.value = {}
+  selectedRow.value = null
   isDialogVisible.value = true
   dialogHeader.value = 'Создание клиента'
 }
@@ -196,6 +201,12 @@ const fetchUsers = async (
     totalPages.value = page.totalPages
     data.value = res.data.content
   } catch (e) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     console.log(e)
   }
 }

@@ -26,9 +26,9 @@
         <Column field="name" header="Название" sortable></Column>
         <Column field="startDate" header="Дата начала" sortable></Column>
         <Column field="endDate" header="Дата окончания" sortable></Column>
-        <template v-if="totalPages > 1" #footer>
+        <template #footer>
           <div class="flex flex-row gap-2 mt-4 justify-between">
-            <div class="flex items-center gap-2">
+            <div v-if="totalPages > 1" class="flex items-center gap-2">
               Страница
               <Button icon="pi pi-chevron-left" @click="previousPage" :disabled="currentPage <= 1"
                 ><</Button
@@ -227,6 +227,12 @@ const fetchExhibitions = async (
     }))
     data.value = content
   } catch (e) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     console.log(e)
   }
 }
@@ -250,6 +256,12 @@ const deleteExhibition = async () => {
 
     await fetchExhibitions()
   } catch (e) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     console.log(e)
   }
 }
@@ -272,6 +284,12 @@ const viewExhibition = async () => {
     // selectedRow.value.books = response.data // Добавляем книги в выбранную выставку
     isDialogVisible.value = true // Открытие модального окна
   } catch (error) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     console.error('Ошибка при загрузке книг выставки:', error)
   }
 }

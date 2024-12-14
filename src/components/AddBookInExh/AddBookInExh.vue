@@ -174,6 +174,12 @@ const onAddBooks = async () => {
 
     emit('save', books)
   } catch (e) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     console.log(e)
   }
 }
@@ -198,6 +204,12 @@ const fetchBooks = async (
     const page = res.data.page
     totalPages.value = page.totalPages
   } catch (e) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     console.log(e)
   }
 }

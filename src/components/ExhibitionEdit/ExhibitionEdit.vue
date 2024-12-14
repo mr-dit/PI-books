@@ -152,6 +152,9 @@ import api from '@/api'
 import { toISODateWithTime } from '@/helpers'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import { z } from 'zod'
+import { useToast } from 'primevue/usetoast'
+
+const toast = useToast()
 
 const props = defineProps({
   exhibition: Object, // Принимаем выставку как prop
@@ -222,6 +225,12 @@ const fetchBooks = async () => {
     })
     books.value = response.data.content
   } catch (error) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     console.error('Ошибка при загрузке книг:', error)
   }
 }
@@ -258,6 +267,12 @@ const onSave = async (c, form) => {
     emit('save')
     console.log(res)
   } catch (e) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка, попробуйте еще раз',
+      life: 3000
+    })
     console.log(e)
   }
 }
