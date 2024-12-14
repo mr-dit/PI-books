@@ -22,14 +22,12 @@
     </div>
     <DataTable
       :value="history"
-      :paginator="true"
       scrollable
       :sortField="sortField"
       :sortOrder="sortOrder"
       @sort="onSort"
       tableStyle="min-width: 50rem"
-      :rows="rowsPerPage"
-      scrollHeight="95%"
+      scrollHeight="600px"
       :first="firstRow"
       @page="onPageChange"
       class="flex-grow mb-4"
@@ -53,9 +51,9 @@
       <template v-if="totalPages > 1" #footer>
         <div class="flex items-center gap-2 mb-4">
           Страница
-          <Button icon="pi pi-chevron-left" @click="previousPage" :disabled="currentPage <= 1"
-            >></Button
-          >
+          <Button icon="pi pi-chevron-left" @click="previousPage" :disabled="currentPage <= 1">{{
+            '<'
+          }}</Button>
           <span>
             <InputNumber
               v-model="currentPage"
@@ -93,10 +91,10 @@ const sortField = ref('dateOfIssue')
 const sortOrder = ref(-1)
 
 const selectedRow = ref(null)
-const rowsPerPage = 50
+const rowsPerPage = 10
 const currentPage = ref(1)
 
-const totalPages = computed(() => Math.ceil(history.value.length / rowsPerPage))
+const totalPages = ref(Math.ceil(history.value.length / rowsPerPage))
 
 // Логика для страницы и пагинации
 const firstRow = computed(() => (currentPage.value - 1) * rowsPerPage)

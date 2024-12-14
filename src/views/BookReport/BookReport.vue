@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen w-screen flex flex-col">
+  <div class="h-screen w-screen flex flex-col overflow-auto">
     <h2 class="text-lg font-bold mb-4">Отчеты</h2>
     <div>
       <TabView>
@@ -10,14 +10,12 @@
           </div>
           <DataTable
             :value="reminders"
-            :paginator="true"
             scrollable
             :sortField="sortField"
             :sortOrder="sortOrder"
             @sort="onSort"
             tableStyle="min-width: 50rem"
-            :rows="rowsPerPage"
-            scrollHeight="95%"
+            scrollHeight="600px"
             :first="firstRow"
             @page="onPageChange"
             class="flex-grow mb-4"
@@ -30,8 +28,11 @@
             <template v-if="totalPages > 1" #footer>
               <div class="flex items-center gap-2 mb-4">
                 Страница
-                <Button icon="pi pi-chevron-left" @click="previousPage" :disabled="currentPage <= 1"
-                  ><</Button
+                <Button
+                  icon="pi pi-chevron-left"
+                  @click="previousPage"
+                  :disabled="currentPage <= 1"
+                  >{{ '<' }}</Button
                 >
                 <span>
                   <InputNumber
@@ -74,13 +75,15 @@ import { useToast } from 'primevue/usetoast'
 
 const toast = useToast()
 
+const reminders = ref([])
+
 const sortField = ref('dateOfIssue')
 const sortOrder = ref(-1)
 
 const rowsPerPage = 50
 const currentPage = ref(1)
 
-const totalPages = computed(() => Math.ceil(reminders.value.length / rowsPerPage))
+const totalPages = ref(Math.ceil(reminders.value.length / rowsPerPage))
 
 // Логика для страницы и пагинации
 const firstRow = computed(() => (currentPage.value - 1) * rowsPerPage)
@@ -120,8 +123,6 @@ const goToPage = async (e) => {
   }
 }
 // ----------------------------
-
-const reminders = ref([])
 
 // Функция экспорта в CSV
 const exportToCSV = async () => {
