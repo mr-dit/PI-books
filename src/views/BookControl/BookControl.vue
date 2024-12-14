@@ -318,6 +318,7 @@ const validateBook = debounce(async (e) => {
 }, 300)
 
 const onUserSave = async (data) => {
+  selectedClient.value = data
   updateClientInfo(data)
   isDialogVisible.value = false
   //  TODO
