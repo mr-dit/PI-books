@@ -15,6 +15,7 @@
           :manualInput="false"
           showIcon
           showButtonBar
+          dateFormat="yy-mm-dd"
           fluid
           iconDisplay="input"
         />

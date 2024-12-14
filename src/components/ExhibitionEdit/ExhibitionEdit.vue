@@ -31,38 +31,55 @@
         </label>
         <label>
           Дата начала
-          <div class="flex gap-1">
-            <InputText
+          <!-- <InputText
               id="startDate"
-              type='date'
+              type="date"
               name="startDate"
               placeholder="Дата начала"
-              required
               :feedback="false"
               fluid
-            />
-          </div>
+            /> -->
+          <DatePicker
+            name="startDate"
+            :model-value="$form?.startDate?.value"
+            :maxDate="$form?.endDate?.value"
+            :manualInput="false"
+            showIcon
+            required
+            fluid
+            dateFormat="yy-mm-dd"
+            showButtonBar
+            iconDisplay="input"
+          />
         </label>
         <label>
           Дата окончания
-          <div class="flex gap-1">
-            <InputText
+          <!-- <InputText
               id="endDate"
-              type='date'
+              type="date"
               name="endDate"
               placeholder="Дата окончания"
-              required
               :feedback="false"
               fluid
-            />
-          </div>
+              /> -->
+          <DatePicker
+            name="endDate"
+            :model-value="$form?.endDate?.value"
+            :minDate="$form?.startDate?.value"
+            showIcon
+            fluid
+            required
+            iconDisplay="input"
+            dateFormat="yy-mm-dd"
+            showButtonBar
+            :manualInput="false"
+          />
         </label>
         <Button type="submit" label="Сохранить" />
       </div>
     </Form>
     <div class="w-3/4 h-full p-4 flex flex-col">
       <h3 class="font-bold text-lg mb-4">Книги на выставке</h3>
-      {{ console.log(newBook) }}
       <DataTable
         :value="newBook"
         :rows="5"
@@ -80,13 +97,15 @@
               >></Button
             >
             <span>
-              <InputText
-                type="number"
-                :disabled="totalPages <= 1"
-                :value="currentPage"
-                @input="validatePagination"
+              <InputNumber
+                v-model="currentPage"
+                mode="decimal"
+                showButtons
+                :min="1"
+                :max="totalPages"
                 @keydown.enter="goToPage"
-                class="w-20"
+                class="!w-20"
+                fluid
             /></span>
             <Button
               icon="pi pi-chevron-right"
@@ -111,6 +130,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import api from '@/api'
+import { toISODateWithTime } from '@/helpers'
 
 const props = defineProps({
   exhibition: Object, // Принимаем выставку как prop
@@ -122,25 +142,14 @@ const emit = defineEmits(['save', 'cancel'])
 const form = ref({
   name: props.exhibition.name || '',
   description: props.exhibition.description || '',
-  startDate: props.exhibition.startDate || '',
-  endDate: props.exhibition.endDate || ''
+  startDate: new Date(props.exhibition.startDate) || '',
+  endDate: new Date(props.exhibition.endDate) || ''
 })
 
 const books = ref([]) // Список книг
-const selectedBook = ref(props.newBook) // Выбранная книга для удаления
 const rowsPerPage = 10
 const currentPage = ref(1)
 const totalPages = ref(Math.ceil(books.value.length / rowsPerPage))
-
-const validatePagination = (e) => {
-  console.log(e)
-
-  const val = e.target.value
-
-  if (val > 0 && val <= totalPages.value) {
-    currentPage.value = val
-  }
-}
 
 const goToPage = async (e) => {
   console.log(e.target.value)
@@ -186,51 +195,15 @@ const onPageChange = (event) => {
   fetchBooks()
 }
 
-const deleteBook = async (book) => {
-  if (confirm(`Вы уверены, что хотите удалить книгу "${book.title}" из выставки?`)) {
-    try {
-      await api.delete(`/exhibitions/${props.exhibition.id}/books/${book.id}`)
-      fetchBooks()
-    } catch (error) {
-      console.error('Ошибка при удалении книги:', error)
-    }
-  }
-}
-
-// Кнопка для удаления книги
-const deleteButton = (rowData) => {
-  return {
-    template: `
-    <Button
-        icon="pi pi-trash"
-        class="p-button-danger"
-        @click="deleteBook(rowData)"
-    />
-    `
-  }
-}
-
 // Сохранить изменения в выставке
 const onSave = async (c, form) => {
-  //   const updatedExhibition = {
-  //     ...form.value,
-  //     books: books.value.map((book) => book.id) // Сохраняем только ID книг
-  //   }
-
-  //   try {
-  //     await api.put(`/exhibitions/${props.exhibition.id}`, updatedExhibition)
-  //     emit('save', updatedExhibition)
-  //     closeDialog()
-  //   } catch (error) {
-  //     console.error('Ошибка при сохранении выставки:', error)
-  //   }
   const states = c.states
 
   const data = {
     name: states.name.value,
     description: states.description.value,
-    startDate: states.startDate.value + 'T00:00:00',
-    endDate: states.endDate.value + 'T00:00:01'
+    startDate: toISODateWithTime(states.startDate.value),
+    endDate: toISODateWithTime(states.endDate.value)
   }
 
   const uniqBooks = props.newBook.filter((book, index, self) => {
@@ -248,12 +221,6 @@ const onSave = async (c, form) => {
     console.log(e)
   }
 }
-
-const closeDialog = () => {
-  emit('cancel')
-}
-
-fetchBooks()
 </script>
 
 <style scoped>
