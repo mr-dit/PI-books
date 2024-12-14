@@ -1,46 +1,48 @@
 <template>
   <div class="h-screen w-screen flex overflow-auto">
     <!-- Панель поиска -->
-    <FilterMenu :inputs="inputs" @search="onSearch">
+    <FilterMenu :inputs="inputs" @search="onSearch" title="Управление выставками">
       <template #footer>
         <div class="flex justify-end flex-col">
           <Button label="Добавить выставку" @click="onAddExhibition" />
         </div>
       </template>
     </FilterMenu>
-    <div class="w-3/4 h-full p-4 flex flex-col">
-      <div class="rounded-lg p-4 shadow-md">
-        <h3 class="font-bold text-lg mb-4">Список выставок</h3>
-        <DataTable
-          :value="data"
-          tableStyle="min-width: 50rem"
-          scrollable
-          scrollHeight="95%"
-          :first="firstRow"
-          @page="onPageChange"
-          selectionMode="single"
-          v-model:selection="selectedRow"
-          @row-select="onSelectExhibition"
-          class="flex-grow mb-4"
-          :style="{ 'min-height': 0, 'min-width': 'auto' }"
-        >
-          <Column field="name" header="Название" sortable></Column>
-          <Column field="startDate" header="Дата начала" sortable></Column>
-          <Column field="endDate" header="Дата окончания" sortable></Column>
-          <template #footer>
-            <div class="flex items-center gap-2 mb-4">
+    <div class="card w-3/4 h-full p-4 flex flex-col">
+      <h2 class="font-bold text-lg mb-4">Список выставок</h2>
+      <DataTable
+        :value="data"
+        tableStyle="min-width: 50rem"
+        scrollable
+        scrollHeight="94%"
+        :first="firstRow"
+        @page="onPageChange"
+        selectionMode="single"
+        v-model:selection="selectedRow"
+        @row-select="onSelectExhibition"
+        class="flex-grow mb-4"
+        :style="{ 'min-height': 0, 'min-width': 'auto' }"
+      >
+        <Column field="name" header="Название" sortable></Column>
+        <Column field="startDate" header="Дата начала" sortable></Column>
+        <Column field="endDate" header="Дата окончания" sortable></Column>
+        <template v-if="totalPages > 1" #footer>
+          <div class="flex flex-row gap-2 mt-4 justify-between">
+            <div class="flex items-center gap-2">
               Страница
               <Button icon="pi pi-chevron-left" @click="previousPage" :disabled="currentPage <= 1"
-                >></Button
+                ><</Button
               >
               <span>
-                <InputText
-                  type="number"
-                  :disabled="totalPages <= 1"
-                  :value="currentPage"
-                  @input="validatePagination"
+                <InputNumber
+                  v-model="currentPage"
+                  mode="decimal"
+                  showButtons
+                  :min="1"
+                  :max="totalPages"
                   @keydown.enter="goToPage"
-                  class="w-20"
+                  class="!w-20"
+                  fluid
                 />
               </span>
               <Button
@@ -51,20 +53,20 @@
               >
               из {{ totalPages }}
             </div>
-          </template>
-        </DataTable>
-      </div>
-      <div class="flex flex-row gap-2 mt-4">
-        <Button class="w-[150px]" :disabled="!selectedRow" @click="viewExhibition">
-          Просмотреть
-        </Button>
-        <Button class="w-[150px]" :disabled="!selectedRow" @click="editExhibition">
-          Редактировать
-        </Button>
-        <Button class="w-[150px]" :disabled="!selectedRow" @click="deleteExhibition">
-          Удалить
-        </Button>
-      </div>
+            <div class="flex gap-2">
+              <Button class="w-[150px]" :disabled="!selectedRow" @click="viewExhibition">
+                Просмотреть
+              </Button>
+              <Button class="w-[150px]" :disabled="!selectedRow" @click="editExhibition">
+                Редактировать
+              </Button>
+              <Button class="w-[150px]" :disabled="!selectedRow" @click="deleteExhibition">
+                Удалить
+              </Button>
+            </div>
+          </div>
+        </template>
+      </DataTable>
     </div>
     <!-- Модальное окно для просмотра выставки -->
     <Dialog v-model:visible="isDialogVisible" modal header="Информация о выставке">
@@ -108,16 +110,16 @@
           class="mt-4 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded"
         />
       </template>
-      <Dialog v-model:visible="isAddBookInExhVisible" modal header="Добавление книги">
-        <AddBookInExh :exhibition="selectedRow" :used-rows="newBook" @save="addBook"></AddBookInExh>
-        <template #footer>
-          <Button
-            label="Закрыть"
-            @click="isAddBookInExhVisible = false"
-            class="mt-4 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded"
-          />
-        </template>
-      </Dialog>
+    </Dialog>
+    <Dialog v-model:visible="isAddBookInExhVisible" modal header="Добавление книги">
+      <AddBookInExh :exhibition="selectedRow" :used-rows="newBook" @save="addBook"></AddBookInExh>
+      <template #footer>
+        <Button
+          label="Закрыть"
+          @click="isAddBookInExhVisible = false"
+          class="mt-4 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded"
+        />
+      </template>
     </Dialog>
   </div>
 </template>
@@ -153,7 +155,7 @@ const isAddBookInExhVisible = ref(false)
 const dialogHeader = ref('')
 const data = ref([]) // Полный список выставок
 const selectedRow = ref(null) // Выбранная выставка
-const rowsPerPage = 10
+const rowsPerPage = 20
 const currentPage = ref(1)
 
 const totalPages = ref(Math.ceil(data.value.length / rowsPerPage))
@@ -206,6 +208,8 @@ const fetchExhibitions = async (
 ) => {
   let url = 'exhibitions' + `?${new URLSearchParams(pagination).toString()}`
 
+  selectedRow.value = null
+
   if (Object.keys(params).length > 0) {
     url += `&${new URLSearchParams(params).toString()}`
   }
@@ -238,6 +242,11 @@ const addBook = async (data) => {
 const deleteExhibition = async () => {
   try {
     await api.delete(`exhibitions/${selectedRow.value.id}`)
+    if (data.value.length === 1 && currentPage.value > 1) {
+      await previousPage()
+      return
+    }
+
     await fetchExhibitions()
   } catch (e) {
     console.log(e)
