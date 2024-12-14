@@ -2,11 +2,12 @@
   <div class="p-4 flex">
     <Form
       v-slot="$form"
+      :resolver="resolver"
       :initialValues="form"
       @submit="(e) => onSave(e, $form)"
       class="flex flex-col gap-4 w-full"
     >
-      <div class="w-3/4 h-full gap-4 p-4 flex flex-col">
+      <div class="h-full gap-4 p-4 flex flex-col">
         <label>
           Название выставки
           <InputText
@@ -17,6 +18,9 @@
             :feedback="false"
             fluid
           />
+          <Message v-if="$form.name?.invalid" severity="error" size="small" variant="simple">{{
+            $form.name.error?.message
+          }}</Message>
         </label>
         <label>
           Описание выставки
@@ -28,6 +32,13 @@
             :feedback="false"
             fluid
           />
+          <Message
+            v-if="$form.description?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+            >{{ $form.description.error?.message }}</Message
+          >
         </label>
         <label>
           Дата начала
@@ -45,12 +56,15 @@
             :maxDate="$form?.endDate?.value"
             :manualInput="false"
             showIcon
-            required
+            placeholder="Дата начала"
             fluid
             dateFormat="yy-mm-dd"
             showButtonBar
             iconDisplay="input"
           />
+          <Message v-if="$form.startDate?.invalid" severity="error" size="small" variant="simple">{{
+            $form.startDate.error?.message
+          }}</Message>
         </label>
         <label>
           Дата окончания
@@ -68,21 +82,26 @@
             :minDate="$form?.startDate?.value"
             showIcon
             fluid
-            required
+            placeholder="Дата окончания"
             iconDisplay="input"
             dateFormat="yy-mm-dd"
             showButtonBar
             :manualInput="false"
           />
+          <Message v-if="$form.endDate?.invalid" severity="error" size="small" variant="simple">{{
+            $form.endDate.error?.message
+          }}</Message>
         </label>
         <Button type="submit" label="Сохранить" />
       </div>
     </Form>
     <div class="w-3/4 h-full p-4 flex flex-col">
-      <h3 class="font-bold text-lg mb-4">Книги на выставке</h3>
+      <h2 class="font-bold text-lg mb-4">Книги на выставке</h2>
       <DataTable
+        class="flex flex-col flex-grow mb-4 justify-between w-[40vw] min-h-[500px]"
         :value="newBook"
-        :rows="5"
+        scrollable
+        scrollHeight="500px"
         tableStyle="min-width: 50rem"
         :first="firstRow"
         @page="onPageChange"
@@ -131,6 +150,8 @@
 import { ref, computed } from 'vue'
 import api from '@/api'
 import { toISODateWithTime } from '@/helpers'
+import { zodResolver } from '@primevue/forms/resolvers/zod'
+import { z } from 'zod'
 
 const props = defineProps({
   exhibition: Object, // Принимаем выставку как prop
@@ -138,6 +159,21 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['save', 'cancel'])
+
+const resolver = ref(
+  zodResolver(
+    z.object({
+      startDate: z
+        .date({ required_error: 'Дата обязательна', invalid_type_error: 'Дата обязательна' })
+        .refine((val) => val !== null, { message: 'Дата обязательна' }),
+      endDate: z
+        .date({ required_error: 'Дата обязательна', invalid_type_error: 'Дата обязательна' })
+        .refine((val) => val !== null, { message: 'Дата обязательна' }),
+      name: z.string().min(1, { message: 'Обязательное поле' }),
+      description: z.string().min(1, { message: 'Обязательное поле' })
+    })
+  )
+)
 
 const form = ref({
   name: props.exhibition.name || '',
@@ -197,6 +233,10 @@ const onPageChange = (event) => {
 
 // Сохранить изменения в выставке
 const onSave = async (c, form) => {
+  if (!form.valid) {
+    return
+  }
+
   const states = c.states
 
   const data = {

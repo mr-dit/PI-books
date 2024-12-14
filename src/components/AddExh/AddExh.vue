@@ -2,6 +2,7 @@
   <div class="flex items-end rounded-lg w-full mx-auto mt-4">
     <Form
       v-slot="$form"
+      :resolver="resolver"
       :initialValues="form"
       @submit="(e) => onSave(e, $form)"
       class="flex flex-col gap-4 w-full"
@@ -9,7 +10,10 @@
       <div class="w-3/4 w-full gap-4 p-4 flex flex-col">
         <label>
           Название выставки
-          <InputText id="name" name="name" placeholder="Имя" required :feedback="false" fluid />
+          <InputText id="name" name="name" placeholder="Имя" :feedback="false" fluid />
+          <Message v-if="$form.name?.invalid" severity="error" size="small" variant="simple">{{
+            $form.name.error?.message
+          }}</Message>
         </label>
         <label>
           Описание выставки
@@ -17,59 +21,54 @@
             id="description"
             name="description"
             placeholder="Описание"
-            required
             :feedback="false"
             fluid
           />
+          <Message
+            v-if="$form.description?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+            >{{ $form.description.error?.message }}</Message
+          >
         </label>
         <label>
           Дата начала
-          <!-- <InputText
-              type="date"
-              :minDate="new Date()"
-              :maxDate="new Date()"
-              id="startDate"
-              placeholder="Дата начала"
-              required
-              :feedback="false"
-              fluid
-              v-model="date"
-              /> -->
           <DatePicker
             name="startDate"
             :minDate="new Date()"
             :maxDate="$form?.endDate?.value"
             :manualInput="false"
             showIcon
+            placeholder="Дата начала"
             fluid
             dateFormat="yy-mm-dd"
             showButtonBar
             iconDisplay="input"
           />
+          <Message v-if="$form.startDate?.invalid" severity="error" size="small" variant="simple">{{
+            $form.startDate.error?.message
+          }}</Message>
         </label>
         <label>
           Дата окончания
-          <!-- <InputText
-              type="date"
-              id="endDate"
-              name="endDate"
-              required
-              placeholder="Дата окончания"
-              fluid
-            /> -->
           <DatePicker
             name="endDate"
             :minDate="$form?.startDate?.value"
             showIcon
             fluid
+            placeholder="Дата окончания"
             iconDisplay="input"
             dateFormat="yy-mm-dd"
             showButtonBar
             :manualInput="false"
           />
+          <Message v-if="$form.endDate?.invalid" severity="error" size="small" variant="simple">{{
+            $form.endDate.error?.message
+          }}</Message>
         </label>
+        <Button type="submit" label="Сохранить" />
       </div>
-      <Button type="submit" label="Сохранить" />
     </Form>
   </div>
 </template>
@@ -78,6 +77,8 @@
 import { ref } from 'vue'
 import api from '@/api'
 import { toISODateWithTime } from '@/helpers'
+import { zodResolver } from '@primevue/forms/resolvers/zod'
+import { z } from 'zod'
 
 const props = defineProps({
   exhibition: Object, // Принимаем выставку как prop
@@ -85,6 +86,21 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['save', 'cancel'])
+
+const resolver = ref(
+  zodResolver(
+    z.object({
+      startDate: z
+        .date({ required_error: 'Дата обязательна' })
+        .refine((val) => val !== null, { message: 'Дата обязательна' }),
+      endDate: z
+        .date({ required_error: 'Дата обязательна' })
+        .refine((val) => val !== null, { message: 'Дата обязательна' }),
+      name: z.string().min(1, { message: 'Обязательное поле' }),
+      description: z.string().min(1, { message: 'Обязательное поле' })
+    })
+  )
+)
 
 const form = ref({
   name: props.exhibition.name || '',
@@ -95,6 +111,10 @@ const form = ref({
 
 // Сохранить изменения в выставке
 const onSave = async (c, form) => {
+  if (!form.valid) {
+    return
+  }
+
   const states = c.states
 
   const data = {

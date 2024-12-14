@@ -113,13 +113,13 @@
     </Dialog>
     <Dialog v-model:visible="isAddBookInExhVisible" modal header="Добавление книги">
       <AddBookInExh :exhibition="selectedRow" :used-rows="newBook" @save="addBook"></AddBookInExh>
-      <template #footer>
+      <!-- <template #footer>
         <Button
           label="Закрыть"
           @click="isAddBookInExhVisible = false"
           class="mt-4 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded"
         />
-      </template>
+      </template> -->
     </Dialog>
   </div>
 </template>
@@ -237,6 +237,7 @@ const newBook = ref([])
 const addBook = async (data) => {
   newBook.value = data.books
   isAddBookInExhVisible.value = false
+  await fetchExhibitions()
 }
 
 const deleteExhibition = async () => {

@@ -6,17 +6,16 @@
       <h2 class="font-bold text-lg mb-4">Результаты поиска</h2>
       <!-- Таблица с результатами -->
       <DataTable
+        class="flex flex-col flex-grow mb-4 justify-between w-full min-h-[500px]"
         :value="data"
-        tableStyle="min-width: 50rem"
         scrollable
-        scrollHeight="85%"
+        table-style="width: 50rem"
+        scrollHeight="450px"
         :first="firstRow"
         @page="onPageChange"
         v-model:selection="selectedRows"
         dataKey="id"
         @row-select="onSelectBook"
-        class="flex-grow mb-4"
-        :style="{ 'min-height': 0, 'min-width': '50rem' }"
       >
         <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
         <Column field="title" header="Название"></Column>
@@ -25,7 +24,7 @@
           <div class="flex items-center gap-2 mb-4">
             Страница
             <Button icon="pi pi-chevron-left" @click="previousPage" :disabled="currentPage <= 1"
-              >></Button
+              ><</Button
             >
             <span>
               <InputNumber
@@ -64,6 +63,7 @@ import { inputs } from './data'
 import FilterMenu from '@/components/FilterMenu'
 import api from '@/api'
 import { useToast } from 'primevue/usetoast'
+import { toISODateWithTime } from '@/helpers'
 
 const toast = useToast()
 
@@ -81,7 +81,7 @@ const props = defineProps({
 const emit = defineEmits(['save', 'cancel'])
 
 const selectedRows = ref(props.usedRows)
-const rowsPerPage = 5
+const rowsPerPage = 10
 const currentPage = ref(1)
 // const currentPage = ref('')
 
@@ -149,20 +149,10 @@ function performSearch() {
 }
 
 const onAddBooks = async () => {
-  // if (selectedRows.value.length === 0) {
-  //   toast.add({
-  //     severity: 'error',
-  //     summary: 'Ошибка',
-  //     detail: 'Выберите книги',
-  //     life: 3000
-  //   })
-  //   return
-  // }
-
   const data = {
     ...props.exhibition,
-    endDate: props.exhibition.endDate,
-    startDate: props.exhibition.startDate
+    endDate: toISODateWithTime(props.exhibition.endDate),
+    startDate: toISODateWithTime(props.exhibition.startDate)
   }
 
   const uniqBooks = selectedRows.value.filter((book, index, self) => {

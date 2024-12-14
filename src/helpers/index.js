@@ -1,4 +1,5 @@
 export function toISODateWithTime(date) {
+  date = new Date(date)
   // Получаем компоненты года, месяца и дня
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0') // Месяцы начинаются с 0
