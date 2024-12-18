@@ -21,6 +21,8 @@
         <p class="text font-semibold mb-2">Идентификатор книги</p>
         <div class="flex flex-col gap-2">
           <input
+            type="number"
+            min="0"
             :disabled="!selectedClient"
             :value="bookId"
             @input="validateBook"
@@ -234,24 +236,43 @@ const goToPage = async (e) => {
 }
 // ------------
 
+const resetStates = () => {
+  selectedClient.value = null
+  bookTitle.value = ''
+  currentIssues.value = []
+  histories.value = []
+  currentPage.value = 1
+  totalPages.value = 1
+  bookId.value = ''
+  clientInfo.value = 'Произошла ошибка при поиске клиента.'
+}
+
 const updateHistories = async (id = selectedClient.value.id) => {
   if (!id) return
-
-  try {
-    const resIssues = await fetchCurrIssues(id)
-    currentIssues.value = resIssues
-
-    const resHistories = await fetchCustomerHistory(id)
-    histories.value = resHistories
-  } catch (error) {
-    toast.add({
-      severity: 'error',
-      summary: 'Ошибка',
-      detail: 'Произошла ошибка, попробуйте еще раз',
-      life: 3000
-    })
-    console.error('Ошибка обновления истории:', error)
+  const resIssues = await fetchCurrIssues(id)
+  if (!resIssues) {
+    resetStates()
+    return false
   }
+  currentIssues.value = resIssues
+
+  const resHistories = await fetchCustomerHistory(id)
+  if (!resHistories) {
+    resetStates()
+    return false
+  }
+  histories.value = resHistories
+  return true
+}
+
+const onError = (error) => {
+  toast.add({
+    severity: 'error',
+    summary: 'Ошибка',
+    detail: 'Произошла ошибка, попробуйте еще раз',
+    life: 3000
+  })
+  console.error('Ошибка обновления истории:', error)
 }
 
 const onSearch = async (searchParams) => {
@@ -263,24 +284,23 @@ const onSearch = async (searchParams) => {
     selectedClient.value = null
     return
   }
-  try {
-    await updateHistories(searchParams.id)
 
+  const resHistories = await updateHistories(searchParams.id)
+
+  if (!resHistories) return
+
+  try {
     const { data } = await api.get('customers' + `?${new URLSearchParams(searchParams).toString()}`)
     if (data && data.content.length > 0) {
       selectedClient.value = data.content[0] // Выбираем первого клиента из результатов поиска
       updateClientInfo(selectedClient.value) // Обновляем данные клиента в textarea
     } else {
       clientInfo.value = 'Клиент не найден.'
+      resetStates()
     }
   } catch (error) {
-    toast.add({
-      severity: 'error',
-      summary: 'Ошибка',
-      detail: 'Произошла ошибка, попробуйте еще раз',
-      life: 3000
-    })
-    console.error('Ошибка поиска клиента:', error)
+    onError(error)
+    resetStates()
     clientInfo.value = 'Произошла ошибка при поиске клиента.'
   }
 }
@@ -309,16 +329,11 @@ const validateBook = debounce(async (e) => {
     const res = await api.get(`books/${val}`)
     bookTitle.value = res.data.title
   } catch (e) {
-    toast.add({
-      severity: 'error',
-      summary: 'Ошибка',
-      detail: 'Произошла ошибка, попробуйте еще раз',
-      life: 3000
-    })
+    onError(e)
     bookTitle.value = ''
     console.log(e)
   }
-}, 300)
+}, 400)
 
 const onUserSave = async (data) => {
   selectedClient.value = data
@@ -345,12 +360,7 @@ const issueBook = async () => {
     const res = await api.post(`history/make-issue/${selectedClient.value.id}/${bookId.value}`)
     await updateHistories()
   } catch (e) {
-    toast.add({
-      severity: 'error',
-      summary: 'Ошибка',
-      detail: 'Произошла ошибка, попробуйте еще раз',
-      life: 3000
-    })
+    onError(e)
     console.log(e)
   }
 }
@@ -364,12 +374,7 @@ const returnBook = async () => {
 
     await updateHistories()
   } catch (e) {
-    toast.add({
-      severity: 'error',
-      summary: 'Ошибка',
-      detail: 'Произошла ошибка, попробуйте еще раз',
-      life: 3000
-    })
+    onError(e)
     console.log(e)
   }
 }
@@ -393,13 +398,7 @@ const fetchCurrIssues = async (
     // totalPages.value = page.totalPages
     return res.data.content
   } catch (e) {
-    toast.add({
-      severity: 'error',
-      summary: 'Ошибка',
-      detail: 'Произошла ошибка, попробуйте еще раз',
-      life: 3000
-    })
-    console.log(e)
+    onError(e)
   }
 }
 
@@ -423,13 +422,7 @@ const fetchCustomerHistory = async (
     totalPages.value = page.totalPages
     return res.data.content
   } catch (e) {
-    toast.add({
-      severity: 'error',
-      summary: 'Ошибка',
-      detail: 'Произошла ошибка, попробуйте еще раз',
-      life: 3000
-    })
-    console.log(e)
+    onError(e)
   }
 }
 </script>
