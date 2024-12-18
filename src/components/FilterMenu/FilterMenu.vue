@@ -40,7 +40,6 @@
 </template>
 
 <script setup>
-import { InputNumber } from 'primevue'
 import { reactive } from 'vue'
 
 const props = defineProps({
