@@ -177,7 +177,7 @@ const onEditUser = () => {
   dialogHeader.value = 'Редактирование клиента'
 }
 const onAddUser = () => {
-  selectedRow.value = null
+  selectedRow.value = undefined
   isDialogVisible.value = true
   dialogHeader.value = 'Создание клиента'
 }
