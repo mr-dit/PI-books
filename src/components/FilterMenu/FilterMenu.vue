@@ -20,6 +20,13 @@
           iconDisplay="input"
         />
         <InputText
+          v-else-if="input.type === 'number'"
+          type="number"
+          :id="input.key"
+          v-model.number="formData[input.key]"
+          class="w-full"
+        />
+        <InputText
           v-else
           type="text"
           :id="input.key"
