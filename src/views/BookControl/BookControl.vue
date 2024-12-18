@@ -323,13 +323,22 @@ const updateClientInfo = (client) => {
 // Простая валидация для книги
 const validateBook = debounce(async (e) => {
   const val = e.target.value
+  if (!val) {
+    bookTitle.value = ''
+    return
+  }
   bookId.value = val
 
   try {
     const res = await api.get(`books/${val}`)
     bookTitle.value = res.data.title
   } catch (e) {
-    onError(e)
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Книга не найдена',
+      life: 3000
+    })
     bookTitle.value = ''
     console.log(e)
   }
