@@ -2,12 +2,17 @@
   <div>
     <div class="flex flex-col mb-4">
       <label for="book-id" class="mb-2">Идентификатор книги</label>
-      <InputText
+      <InputNumber
         id="book-id"
-        v-model="bookId"
+        :model-value="bookId"
         class="p-2 border rounded-lg"
         placeholder="Введите идентификатор книги"
-        @input="fetchBookHistory"
+        @input="
+          (e) => {
+            bookId = e.value
+            fetchBookHistory()
+          }
+        "
       />
     </div>
     <!-- Информация о книге -->
@@ -15,7 +20,7 @@
       <h3 class="text-xl font-semibold">{{ bookInfo.title }}</h3>
       <p class="text-gray-500">{{ bookInfo.subtitle }}</p>
     </div>
-    <div v-else class="mb-4 text-red-500">Книга не найдена</div>
+    <div v-else-if="bookInfo === null" class="mb-4 text-red-500">Книга не найдена</div>
 
     <div class="flex justify-end mb-4">
       <Button class="w-[150px]" label="Экспорт" @click="exportToCSV('history')" />
@@ -84,8 +89,8 @@ import { useToast } from 'primevue/usetoast'
 
 const toast = useToast()
 
-const bookId = ref('')
-const bookInfo = ref(null)
+const bookId = ref(null)
+const bookInfo = ref(undefined)
 const history = ref([])
 const sortField = ref('dateOfIssue')
 const sortOrder = ref(-1)
@@ -136,6 +141,14 @@ const goToPage = async (e) => {
 // ----------------------------
 
 const fetchBookHistory = debounce(async () => {
+  if (!bookId.value) {
+    totalPages.value = 1
+    currentPage.value = 1
+    history.value = []
+    bookInfo.value = undefined
+    return
+  }
+
   try {
     const res = await api.get(`books/${bookId.value}`)
     bookInfo.value = res.data
