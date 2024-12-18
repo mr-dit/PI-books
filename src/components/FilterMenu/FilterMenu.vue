@@ -21,9 +21,8 @@
         />
         <InputNumber
           v-else-if="input.type === 'number'"
-          type="number"
           :id="input.key"
-          v-model.number="formData[input.key]"
+          v-model="formData[input.key]"
           class="w-full"
         />
         <InputText
@@ -41,7 +40,7 @@
 </template>
 
 <script setup>
-import { InputNumber } from 'primevue';
+import { InputNumber } from 'primevue'
 import { reactive } from 'vue'
 
 const props = defineProps({
@@ -61,6 +60,9 @@ const emit = defineEmits(['search'])
 const formData = reactive(
   props.inputs.reduce((acc, input) => {
     acc[input.key] = ''
+    if (input.type === 'number') {
+      acc[input.key] = null
+    }
     return acc
   }, {})
 )
