@@ -19,7 +19,7 @@
           fluid
           iconDisplay="input"
         />
-        <InputText
+        <InputNumber
           v-else-if="input.type === 'number'"
           type="number"
           :id="input.key"
@@ -41,6 +41,7 @@
 </template>
 
 <script setup>
+import { InputNumber } from 'primevue';
 import { reactive } from 'vue'
 
 const props = defineProps({
